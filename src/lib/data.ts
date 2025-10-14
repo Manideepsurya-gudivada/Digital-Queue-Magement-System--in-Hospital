@@ -54,7 +54,7 @@ export interface CaseStudy {
   image?: ImagePlaceholder;
 }
 
-const users: User[] = [
+export const users: User[] = [
   { id: 'user-1', name: 'Admin User', email: 'admin@mediqueue.pro', role: 'ADMIN', phone: '123-456-7890', avatar: avatarImages[0] },
   { id: 'user-2', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7891', avatar: avatarImages[1] },
   { id: 'user-3', name: 'John Doe', email: 'john.doe@mediqueue.pro', role: 'PATIENT', phone: '123-456-7892', avatar: avatarImages[2] },
@@ -65,15 +65,15 @@ const users: User[] = [
 ];
 
 export const doctors: Doctor[] = [
-  { id: 'doc-1', userId: 'user-2', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7891', avatar: avatarImages[1], specialization: 'Cardiology', department: 'Cardiology' },
-  { id: 'doc-2', userId: 'user-4', name: 'Dr. Samuel Green', email: 'samuel.green@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7893', avatar: avatarImages[3], specialization: 'Neurology', department: 'Neurology' },
+  { id: 'doc-1', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7891', avatar: avatarImages[1], specialization: 'Cardiology', department: 'Cardiology' },
+  { id: 'doc-2', name: 'Dr. Samuel Green', email: 'samuel.green@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7893', avatar: avatarImages[3], specialization: 'Neurology', department: 'Neurology' },
 ];
 
 export const patients: Patient[] = [
-  { id: 'pat-1', userId: 'user-3', name: 'John Doe', email: 'john.doe@mediqueue.pro', role: 'PATIENT', phone: '123-456-7892', avatar: avatarImages[2], age: 45, gender: 'Male', medicalHistory: 'Hypertension' },
-  { id: 'pat-2', userId: 'user-5', name: 'Jane Smith', email: 'jane.smith@mediqueue.pro', role: 'PATIENT', phone: '123-456-7894', avatar: avatarImages[4], age: 34, gender: 'Female', medicalHistory: 'Asthma' },
-  { id: 'pat-3', userId: 'user-6', name: 'Emily White', email: 'emily.white@mediqueue.pro', role: 'PATIENT', phone: '123-456-7895', avatar: avatarImages[0], age: 28, gender: 'Female', medicalHistory: 'None' },
-  { id: 'pat-4', userId: 'user-7', name: 'Michael Brown', email: 'michael.brown@mediqueue.pro', role: 'PATIENT', phone: '123-456-7896', avatar: avatarImages[1], age: 52, gender: 'Male', medicalHistory: 'Diabetes Type 2' },
+  { id: 'pat-1', name: 'John Doe', email: 'john.doe@mediqueue.pro', role: 'PATIENT', phone: '123-456-7892', avatar: avatarImages[2], age: 45, gender: 'Male', medicalHistory: 'Hypertension' },
+  { id: 'pat-2', name: 'Jane Smith', email: 'jane.smith@mediqueue.pro', role: 'PATIENT', phone: '123-456-7894', avatar: avatarImages[4], age: 34, gender: 'Female', medicalHistory: 'Asthma' },
+  { id: 'pat-3', name: 'Emily White', email: 'emily.white@mediqueue.pro', role: 'PATIENT', phone: '123-456-7895', avatar: avatarImages[0], age: 28, gender: 'Female', medicalHistory: 'None' },
+  { id: 'pat-4', name: 'Michael Brown', email: 'michael.brown@mediqueue.pro', role: 'PATIENT', phone: '123-456-7896', avatar: avatarImages[1], age: 52, gender: 'Male', medicalHistory: 'Diabetes Type 2' },
 ];
 
 export const queues: QueueItem[] = [
