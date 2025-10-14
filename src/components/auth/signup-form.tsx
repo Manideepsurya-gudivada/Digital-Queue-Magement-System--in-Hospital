@@ -5,15 +5,17 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
-import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
+import { useToast } from '@/hooks/use-toast';
 
 export function SignupForm() {
   const router = useRouter();
-  const auth = useAuth();
+  const auth = useAuth() as Auth;
   const { user, isUserLoading } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isUserLoading && user) {
@@ -25,7 +27,15 @@ export function SignupForm() {
     e.preventDefault();
     // In a real app, you would also collect other user details (like name)
     // and create a user document in Firestore.
-    initiateEmailSignUp(auth, email, password);
+    createUserWithEmailAndPassword(auth, email, password)
+      .catch((error) => {
+        console.error("Signup Error:", error);
+        toast({
+          variant: "destructive",
+          title: "Signup Failed",
+          description: error.message,
+        });
+      });
   };
 
   return (

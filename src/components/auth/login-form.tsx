@@ -5,21 +5,21 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import { Auth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { users } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 export function LoginForm() {
   const router = useRouter();
-  const auth = useAuth();
+  const auth = useAuth() as Auth;
   const { user, isUserLoading } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      // Find the user's role from the mock data based on email.
-      // In a real app, this role would come from your database.
       const matchedUser = users.find(u => u.email === user.email);
       if (matchedUser?.role === 'ADMIN') {
         router.push('/admin');
@@ -33,7 +33,17 @@ export function LoginForm() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    initiateEmailSignIn(auth, email, password);
+    signInWithEmailAndPassword(auth, email, password)
+      .catch((error) => {
+        console.error("Login Error:", error);
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: error.message === 'Firebase: Error (auth/invalid-credential).'
+            ? "Invalid email or password. Please try again."
+            : error.message,
+        });
+      });
   };
 
   return (
