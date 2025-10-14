@@ -1,3 +1,58 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "avatar-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://picsum.photos/seed/avatar3/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-4",
+      "description": "User avatar 4",
+      "imageUrl": "https://picsum.photos/seed/avatar4/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-5",
+      "description": "User avatar 5",
+      "imageUrl": "https://picsum.photos/seed/avatar5/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "case-study-1",
+      "description": "Case study image 1",
+      "imageUrl": "https://picsum.photos/seed/casestudy1/400/300",
+      "imageHint": "medical procedure"
+    },
+    {
+      "id": "case-study-2",
+      "description": "Case study image 2",
+      "imageUrl": "https://picsum.photos/seed/casestudy2/400/300",
+      "imageHint": "doctor patient"
+    },
+    {
+      "id": "case-study-3",
+      "description": "Case study image 3",
+      "imageUrl": "https://picsum.photos/seed/casestudy3/400/300",
+      "imageHint": "hospital hallway"
+    },
+    {
+      "id": "login-background",
+      "description": "Login page background image",
+      "imageUrl": "https://picsum.photos/seed/loginbg/1920/1080",
+      "imageHint": "hospital interior"
+    }
+  ]
 }
