@@ -31,8 +31,15 @@ const PredictWaitTimeOutputSchema = z.object({
 export type PredictWaitTimeOutput = z.infer<typeof PredictWaitTimeOutputSchema>;
 
 export async function predictWaitTime(
-  input: PredictWaitTimeInput
+  prevState: PredictWaitTimeOutput,
+  formData: FormData
 ): Promise<PredictWaitTimeOutput> {
+  const input: PredictWaitTimeInput = {
+      patientLoad: Number(formData.get('patientLoad')),
+      doctorSchedule: formData.get('doctorSchedule') as string,
+      caseComplexity: formData.get('caseComplexity') as string,
+      historicalData: formData.get('historicalData') as string,
+  };
   return predictWaitTimeFlow(input);
 }
 
