@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { predictWaitTime } from '@/ai/flows/intelligent-wait-time-prediction';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -9,11 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Wand2 } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 import { Progress } from '../ui/progress';
+import type { PredictWaitTimeOutput } from '@/ai/flows/intelligent-wait-time-prediction';
 
-const initialState = {
-  estimatedWaitTime: null,
-  confidenceLevel: null,
-  rationale: null,
+
+const initialState: PredictWaitTimeOutput = {
+  estimatedWaitTime: 0,
+  confidenceLevel: 0,
+  rationale: '',
 };
 
 function SubmitButton() {
@@ -27,7 +30,7 @@ function SubmitButton() {
 }
 
 export function PredictionTool() {
-  const [state, formAction] = useFormState(predictWaitTime, initialState);
+  const [state, formAction] = useActionState(predictWaitTime, initialState);
 
   return (
     <div className="grid lg:grid-cols-2 gap-8 items-start">
@@ -67,7 +70,7 @@ export function PredictionTool() {
                 <CardDescription>The estimated wait time based on the provided data.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-            {state.estimatedWaitTime !== null ? (
+            {state.estimatedWaitTime > 0 ? (
                 <>
                 <div>
                     <p className="text-sm text-muted-foreground">Estimated Wait Time</p>
