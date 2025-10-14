@@ -7,9 +7,10 @@ import { queues } from '@/lib/data';
 
 export function QueueStatus() {
   const patientQueueItem = queues.find(q => q.patientId === 'pat-2'); // Demo for Jane Smith
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setCurrentTime(new Date());
     const timer = setInterval(() => setCurrentTime(new Date()), 60000); // Update every minute
     return () => clearInterval(timer);
   }, []);
@@ -51,8 +52,8 @@ export function QueueStatus() {
           </div>
         </div>
 
-        <div className="mt-8 text-sm text-muted-foreground">
-            Last updated: {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <div className="mt-8 text-sm text-muted-foreground h-4">
+            {currentTime && `Last updated: ${currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
         </div>
       </CardContent>
     </Card>
