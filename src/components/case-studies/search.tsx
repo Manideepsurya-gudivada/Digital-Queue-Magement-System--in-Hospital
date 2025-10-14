@@ -1,28 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useState, useActionState } from 'react';
 import { caseStudyNlpSearch } from '@/ai/flows/case-study-nlp-search';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search as SearchIcon, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import type { CaseStudyNlpSearchOutput } from '@/ai/flows/case-study-nlp-search';
 
-const initialState = {
+const initialState: CaseStudyNlpSearchOutput = {
   results: [],
 };
 
 export function CaseStudySearch() {
   const [query, setQuery] = useState('');
-  const [state, formAction] = useFormState(caseStudyNlpSearch, initialState);
-  const [isPending, setIsPending] = useState(false);
+  const [state, formAction, isPending] = useActionState(caseStudyNlpSearch, initialState);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsPending(true);
     const formData = new FormData(event.currentTarget);
-    await formAction(formData);
-    setIsPending(false);
+    formAction(formData);
   };
 
   return (
