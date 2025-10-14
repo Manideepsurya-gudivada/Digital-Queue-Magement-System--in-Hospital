@@ -1,0 +1,78 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user of the application.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The user's unique ID." },
+        "email": { "type": "string", "format": "email", "description": "The user's email address." },
+        "displayName": { "type": "string", "description": "The user's display name." },
+        "photoURL": { "type": "string", "format": "uri", "description": "URL of the user's profile picture." },
+        "role": { "type": "string", "enum": ["ADMIN", "DOCTOR", "PATIENT"], "description": "The user's role." }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "PatientRecord": {
+      "title": "Patient Record",
+      "description": "Represents a single medical record for a patient's visit.",
+      "type": "object",
+      "properties": {
+        "record_id": { "type": "string", "description": "Unique ID for the record." },
+        "patient_id": { "type": "string", "description": "ID of the patient." },
+        "doctor_id": { "type": "string", "description": "ID of the attending doctor." },
+        "visit_date": { "type": "string", "format": "date-time", "description": "Date and time of the consultation." },
+        "diagnosis": { "type": "string", "description": "Summary of the diagnosis." },
+        "prescription": { "type": "string", "description": "Medications prescribed." },
+        "notes": { "type": "string", "description": "Additional notes from the doctor." }
+      },
+      "required": ["record_id", "patient_id", "doctor_id", "visit_date"]
+    },
+    "CaseStudy": {
+        "title": "Case Study",
+        "description": "Represents a medical case study.",
+        "type": "object",
+        "properties": {
+            "case_id": { "type": "string", "description": "Unique ID for the case study." },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "category": { "type": "string" },
+            "keywords": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["case_id", "title", "description"]
+    },
+    "CaseStudyLink": {
+      "title": "Case Study Link",
+      "description": "Links a patient record to a case study.",
+      "type": "object",
+      "properties": {
+        "link_id": { "type": "string", "description": "Unique ID for the link." },
+        "patient_id": { "type": "string", "description": "ID of the linked patient." },
+        "case_id": { "type": "string", "description": "ID of the linked case study." },
+        "relevance_score": { "type": "number", "description": "AI-calculated similarity score." }
+      },
+      "required": ["link_id", "patient_id", "case_id"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores public-facing user profile information."
+    },
+    "/patients/{patientId}/records/{recordId}": {
+      "schema": { "$ref": "#/entities/PatientRecord" },
+      "description": "Stores medical records for a specific patient."
+    },
+    "/caseStudies/{caseId}": {
+        "schema": { "$ref": "#/entities/CaseStudy" },
+        "description": "Stores all medical case studies."
+    },
+    "/caseStudyLinks/{linkId}": {
+        "schema": { "$ref": "#/entities/CaseStudyLink" },
+        "description": "Stores links between patients and case studies."
+    }
+  }
+}
