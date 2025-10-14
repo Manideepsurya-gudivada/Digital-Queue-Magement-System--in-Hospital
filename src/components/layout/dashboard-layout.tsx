@@ -38,7 +38,7 @@ export function DashboardLayout({ children, user, pageTitle }: DashboardLayoutPr
           <SidebarNav role={user.role} />
         </SidebarContent>
         <SidebarFooter className="p-4">
-           <Link href="/" legacyBehavior passHref>
+           <Link href="/">
             <Button variant="ghost" className="w-full justify-start gap-2">
               <LogOut size={16} />
               <span className="group-data-[collapsible=icon]:hidden">Logout</span>

@@ -22,7 +22,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
 
   const patientNav = (
     <SidebarMenuItem>
-      <Link href="/dashboard" legacyBehavior passHref>
+      <Link href="/dashboard">
         <SidebarMenuButton isActive={isActive('/dashboard')} tooltip="Dashboard">
           <LayoutDashboard />
           <span>Queue Status</span>
@@ -34,7 +34,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
   const doctorNav = (
     <>
       <SidebarMenuItem>
-        <Link href="/doctor" legacyBehavior passHref>
+        <Link href="/doctor">
           <SidebarMenuButton isActive={isActive('/doctor')} tooltip="Patient Queue">
             <Users />
             <span>Patient Queue</span>
@@ -42,7 +42,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
         </Link>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <Link href="/case-studies" legacyBehavior passHref>
+        <Link href="/case-studies">
           <SidebarMenuButton isActive={isActive('/case-studies')} tooltip="Case Studies">
             <FileText />
             <span>Case Studies</span>
@@ -55,7 +55,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
   const adminNav = (
     <>
       <SidebarMenuItem>
-        <Link href="/admin" legacyBehavior passHref>
+        <Link href="/admin">
           <SidebarMenuButton isActive={isActive('/admin')} tooltip="Analytics">
             <BarChart3 />
             <span>Analytics</span>
@@ -63,7 +63,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
         </Link>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <Link href="/doctor" legacyBehavior passHref>
+        <Link href="/doctor">
           <SidebarMenuButton isActive={isActive('/doctor')} tooltip="Live Queues">
             <Users />
             <span>Live Queues</span>
@@ -71,7 +71,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
         </Link>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <Link href="/case-studies" legacyBehavior passHref>
+        <Link href="/case-studies">
           <SidebarMenuButton isActive={isActive('/case-studies')} tooltip="Case Studies">
             <FileText />
             <span>Case Studies</span>
@@ -105,7 +105,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
         <SidebarGroup>
           <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
           <SidebarMenuItem>
-            <Link href="/predict" legacyBehavior passHref>
+            <Link href="/predict">
               <SidebarMenuButton isActive={isActive('/predict')} tooltip="Wait Time Predictor">
                 <Bot />
                 <span>Wait Time Predictor</span>
