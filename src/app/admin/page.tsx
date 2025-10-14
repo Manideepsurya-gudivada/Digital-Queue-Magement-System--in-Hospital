@@ -1,14 +1,42 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { StatsCards } from "@/components/admin/stats-cards";
 import { PatientFlowChart } from "@/components/admin/patient-flow-chart";
 import { DoctorManagementTable } from "@/components/admin/doctor-management-table";
+import { useUser } from "@/firebase";
 import { users } from "@/lib/data";
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminDashboardPage() {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/');
+    }
+  }, [user, isUserLoading, router]);
+
   const adminUser = users.find(u => u.role === 'ADMIN');
 
-  if (!adminUser) {
-    return <div>Admin user not found.</div>;
+  if (isUserLoading || !user || !adminUser) {
+    return (
+      <div className="p-8">
+        <Skeleton className="h-16 w-1/2 mb-8" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            <Skeleton className="h-28" />
+            <Skeleton className="h-28" />
+            <Skeleton className="h-28" />
+        </div>
+        <div className="grid gap-8 lg:grid-cols-2">
+            <Skeleton className="h-96" />
+            <Skeleton className="h-96" />
+        </div>
+      </div>
+    );
   }
 
   return (
