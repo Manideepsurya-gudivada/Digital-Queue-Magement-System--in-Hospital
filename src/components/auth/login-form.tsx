@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -5,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import { Auth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
 import { users } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
@@ -31,19 +32,25 @@ export function LoginForm() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .catch((error) => {
-        console.error("Login Error:", error);
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: error.message === 'Firebase: Error (auth/invalid-credential).'
-            ? "Invalid email or password. Please try again."
-            : error.message,
-        });
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // The redirect will be handled by the useEffect hook
+    } catch (error: any) {
+      console.error("Login Error:", error);
+      let description = "An unexpected error occurred. Please try again.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        description = "Invalid email or password. Please try again.";
+      } else {
+        description = error.message;
+      }
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: description,
       });
+    }
   };
 
   return (
