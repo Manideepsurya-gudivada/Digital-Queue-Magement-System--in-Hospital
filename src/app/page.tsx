@@ -37,30 +37,41 @@ export default function AuthenticationPage() {
         </div>
       </div>
       <div className="lg:p-8 flex items-center justify-center w-full">
-        <Card className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] shadow-2xl">
+        <Card className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] shadow-2xl">
           <CardHeader className="space-y-1 text-center">
             <div className="flex items-center justify-center text-lg font-medium font-headline">
               <Logo className="mr-2 h-8 w-8 text-primary" />
             </div>
             <CardTitle className="text-2xl font-headline">Welcome to MediQueue Pro</CardTitle>
-            <CardDescription>Enter your credentials to access your dashboard</CardDescription>
+            <CardDescription>Select your role to sign in or create an account.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" className="w-full">
+            <Tabs defaultValue="patient" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsTrigger value="patient">I'm a Patient</TabsTrigger>
+                <TabsTrigger value="staff">I'm a Doctor / Admin</TabsTrigger>
               </TabsList>
-              <TabsContent value="login" className="pt-4">
-                <LoginForm />
+              <TabsContent value="patient" className="pt-4">
+                <Tabs defaultValue="login" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="login">Login</TabsTrigger>
+                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="login" className="pt-4">
+                    <LoginForm role="PATIENT" />
+                  </TabsContent>
+                  <TabsContent value="signup" className="pt-4">
+                    <SignupForm role="PATIENT" />
+                  </TabsContent>
+                </Tabs>
               </TabsContent>
-              <TabsContent value="signup" className="pt-4">
-                <SignupForm />
+              <TabsContent value="staff" className="pt-4">
+                <LoginForm role="DOCTOR" />
+                 <p className="px-8 text-center text-sm text-muted-foreground mt-4">
+                  Demo Login: `admin@mediqueue.pro` or `evelyn.reed@mediqueue.pro`
+                </p>
               </TabsContent>
             </Tabs>
-             <p className="px-8 text-center text-sm text-muted-foreground mt-4">
-              Demo Login: `admin@..`, `evelyn@..` (doctor), or any other email for patient.
-            </p>
           </CardContent>
         </Card>
       </div>

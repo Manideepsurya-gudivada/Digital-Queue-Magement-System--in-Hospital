@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -8,10 +7,14 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
-import { users } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
+import type { UserRole } from '@/lib/data';
 
-export function LoginForm() {
+interface LoginFormProps {
+  role: UserRole;
+}
+
+export function LoginForm({ role }: LoginFormProps) {
   const router = useRouter();
   const auth = useAuth() as Auth;
   const { user, isUserLoading } = useUser();
@@ -21,16 +24,17 @@ export function LoginForm() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      const matchedUser = users.find(u => u.email === user.email);
-      if (matchedUser?.role === 'ADMIN') {
+      // The logic to find a matched user from mock data is removed
+      // as we will rely on Firebase to determine roles later.
+      if (email.startsWith('admin')) {
         router.push('/admin');
-      } else if (matchedUser?.role === 'DOCTOR') {
+      } else if (role === 'DOCTOR') {
         router.push('/doctor');
       } else {
         router.push('/dashboard');
       }
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, email, role]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,9 +60,9 @@ export function LoginForm() {
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email-login">Email</Label>
+        <Label htmlFor={`email-login-${role}`}>Email</Label>
         <Input
-          id="email-login"
+          id={`email-login-${role}`}
           type="email"
           placeholder="user@example.com"
           required
@@ -67,9 +71,9 @@ export function LoginForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password-login">Password</Label>
+        <Label htmlFor={`password-login-${role}`}>Password</Label>
         <Input 
-          id="password-login" 
+          id={`password-login-${role}`} 
           type="password" 
           required 
           value={password}

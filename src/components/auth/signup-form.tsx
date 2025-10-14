@@ -8,8 +8,13 @@ import { useState, useEffect } from 'react';
 import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
+import type { UserRole } from '@/lib/data';
 
-export function SignupForm() {
+interface SignupFormProps {
+  role: UserRole;
+}
+
+export function SignupForm({ role }: SignupFormProps) {
   const router = useRouter();
   const auth = useAuth() as Auth;
   const { user, isUserLoading } = useUser();
@@ -19,15 +24,21 @@ export function SignupForm() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      router.push('/dashboard');
+      if (role === 'DOCTOR') {
+        router.push('/doctor');
+      } else if (role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, role]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       // In a real app, you would also collect other user details (like name)
-      // and create a user document in Firestore.
+      // and create a user document in Firestore based on the role.
       await createUserWithEmailAndPassword(auth, email, password);
       // The redirect will be handled by the useEffect hook
     } catch (error: any) {
@@ -51,13 +62,13 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSignup} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name-signup">Full Name</Label>
-        <Input id="name-signup" placeholder="John Doe" required />
+        <Label htmlFor={`name-signup-${role}`}>Full Name</Label>
+        <Input id={`name-signup-${role}`} placeholder="John Doe" required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email-signup">Email</Label>
+        <Label htmlFor={`email-signup-${role}`}>Email</Label>
         <Input 
-          id="email-signup" 
+          id={`email-signup-${role}`} 
           type="email" 
           placeholder="user@example.com" 
           required 
@@ -66,9 +77,9 @@ export function SignupForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password-signup">Password</Label>
+        <Label htmlFor={`password-signup-${role}`}>Password</Label>
         <Input 
-          id="password-signup" 
+          id={`password-signup-${role}`} 
           type="password" 
           required 
           value={password}
