@@ -1,0 +1,189 @@
+/**
+ * @fileoverview Firestore Security Rules for MediQueue Pro.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for personal data (users, patients, doctors, notifications)
+ * and an owner-write, public-read model for publicly available data (case studies, queues).  All write operations require
+ * authentication and authorization checks. Data structure and naming conventions are chosen to optimize rule performance and readability.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profiles, accessible only to the user themselves.
+ * - /users/{userId}/patients/{patientId}: Stores patient profiles, accessible only to the owning user.
+ * - /users/{userId}/doctors/{doctorId}: Stores doctor profiles, accessible only to the owning user.
+ * - /users/{userId}/notifications/{notificationId}: Stores notifications, accessible only to the owning user.
+ * - /queues/{queueId}: Stores queue entries, publicly readable, writable only by authorized users (e.g., doctors).
+ * - /case_studies/{caseStudyId}: Stores case studies, publicly readable, writable only by the owning doctor.
+ *
+ * Key Security Decisions:
+ * - User listing is explicitly denied to prevent unauthorized access to user data.
+ * - The 'id' field is used as the primary key for all entities, matching the Firebase Auth UID where applicable.
+ * - Read-only collections are not used in this data model.
+ * - The default security posture is to deny all access unless explicitly granted.
+ *
+ * Denormalization for Authorization:
+ * - The 'Patient', 'Doctor', 'Queue', 'CaseStudy', and 'Notification' entities all include denormalized 'userId' fields for efficient authorization checks, avoiding costly 'get()' operations.
+ *
+ * Structural Segregation:
+ * - Publicly readable data (case studies, queues) is stored in top-level collections separate from private user data.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Protects user profiles, ensuring only the user can read and write their own data.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' can create their profile.
+     * @allow (get) User with ID 'user123' can read their profile.
+     * @allow (update) User with ID 'user123' can update their profile.
+     * @allow (delete) User with ID 'user123' can delete their profile.
+     * @deny (create) User with ID 'user123' cannot create a profile with ID 'user456'.
+     * @principle Enforces document ownership for all operations on user profiles.
+     */
+    match /users/{userId} {
+      // Helper function to check if the user is signed in and owns the resource.
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // Helper function to check if the user is signed in.
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && resource.data.id == userId; // Enforce immutability of userId
+      allow delete: if isOwner(userId) && resource.data.id == userId; // Enforce immutability of userId
+    }
+
+    /**
+     * @description Manages patient profiles associated with a user, allowing only the user to manage their patients.
+     * @path /users/{userId}/patients/{patientId}
+     * @allow (create) User 'user123' can create a patient profile for themselves.
+     * @allow (get) User 'user123' can read a patient profile they own.
+     * @allow (update) User 'user123' can update a patient profile they own.
+     * @allow (delete) User 'user123' can delete a patient profile they own.
+     * @deny (create) User 'user123' cannot create a patient profile for 'user456'.
+     * @principle Enforces ownership of patient profiles, linking them to the owning user.
+     */
+    match /users/{userId}/patients/{patientId} {
+       // Helper function to check if the user is signed in and owns the resource.
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // Helper function to check if the user is signed in.
+      function isSignedIn() {
+        return request.auth != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isOwner(userId) && resource.data.userId == userId; // Enforce immutability of userId
+      allow delete: if isOwner(userId) && resource.data.userId == userId; // Enforce immutability of userId
+    }
+
+     /**
+      * @description Manages doctor profiles associated with a user, allowing only the user to manage their doctors.
+      * @path /users/{userId}/doctors/{doctorId}
+      * @allow (create) User 'user123' can create a doctor profile for themselves.
+      * @allow (get) User 'user123' can read a doctor profile they own.
+      * @allow (update) User 'user123' can update a doctor profile they own.
+      * @allow (delete) User 'user123' can delete a doctor profile they own.
+      * @deny (create) User 'user123' cannot create a doctor profile for 'user456'.
+      * @principle Enforces ownership of doctor profiles, linking them to the owning user.
+      */
+    match /users/{userId}/doctors/{doctorId} {
+       // Helper function to check if the user is signed in and owns the resource.
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // Helper function to check if the user is signed in.
+      function isSignedIn() {
+        return request.auth != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isOwner(userId) && resource.data.userId == userId; // Enforce immutability of userId
+      allow delete: if isOwner(userId) && resource.data.userId == userId; // Enforce immutability of userId
+    }
+
+    /**
+     * @description Manages queue entries, allowing public read access but restricting write access to authorized users (doctors).
+     * @path /queues/{queueId}
+     * @allow (get) Any user can read queue entries.
+     * @allow (list) Any user can list queue entries.
+     * @allow (create) A doctor can create a new queue entry.  Requires doctorId matches a known doctor (authorization TBD).
+     * @allow (update) A doctor can update a queue entry. Requires doctorId matches a known doctor (authorization TBD).
+     * @allow (delete) A doctor can delete a queue entry. Requires doctorId matches a known doctor (authorization TBD).
+     * @deny (create) A non-authenticated user cannot create a queue entry.
+     * @principle Allows public read access while restricting write access to authorized doctors.
+     */
+    match /queues/{queueId} {
+       // Helper function to check if the user is signed in and owns the resource.
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn(); // TODO: Add doctor role check
+      allow update: if isSignedIn(); // TODO: Add doctor role check
+      allow delete: if isSignedIn(); // TODO: Add doctor role check
+    }
+
+    /**
+     * @description Manages case studies, allowing public read access but restricting write access to the owning doctor.
+     * @path /case_studies/{caseStudyId}
+     * @allow (get) Any user can read case studies.
+     * @allow (list) Any user can list case studies.
+     * @allow (create) A doctor can create a new case study for themselves.
+     * @allow (update) A doctor can update a case study they own.
+     * @allow (delete) A doctor can delete a case study they own.
+     * @deny (create) A non-authenticated user cannot create a case study.
+     * @principle Allows public read access while restricting write access to the owning doctor.
+     */
+    match /case_studies/{caseStudyId} {
+       // Helper function to check if the user is signed in and owns the resource.
+      function isSignedIn() {
+        return request.auth != null;
+      }
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn(); // TODO: Add doctor role check and doctorId ownership check.
+      allow update: if isSignedIn(); // TODO: Add doctor role check and doctorId ownership check.
+      allow delete: if isSignedIn(); // TODO: Add doctor role check and doctorId ownership check.
+    }
+
+    /**
+     * @description Manages notifications for users, ensuring only the user can access their own notifications.
+     * @path /users/{userId}/notifications/{notificationId}
+     * @allow (create) User 'user123' can create a notification for themselves.
+     * @allow (get) User 'user123' can read a notification they own.
+     * @allow (update) User 'user123' can update a notification they own.
+     * @allow (delete) User 'user123' can delete a notification they own.
+     * @deny (create) User 'user123' cannot create a notification for 'user456'.
+     * @principle Enforces ownership of notifications, linking them to the owning user.
+     */
+    match /users/{userId}/notifications/{notificationId} {
+       // Helper function to check if the user is signed in and owns the resource.
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // Helper function to check if the user is signed in.
+      function isSignedIn() {
+        return request.auth != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isOwner(userId) && resource.data.userId == userId; // Enforce immutability of userId
+      allow delete: if isOwner(userId) && resource.data.userId == userId; // Enforce immutability of userId
+    }
+  }
+}

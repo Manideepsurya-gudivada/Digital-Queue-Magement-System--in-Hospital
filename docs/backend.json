@@ -1,78 +1,358 @@
 {
   "entities": {
-    "UserProfile": {
-      "title": "User Profile",
-      "description": "Represents a user of the application.",
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
       "type": "object",
+      "description": "Represents a user of the system (Admin, Doctor, or Patient).",
       "properties": {
-        "uid": { "type": "string", "description": "The user's unique ID." },
-        "email": { "type": "string", "format": "email", "description": "The user's email address." },
-        "displayName": { "type": "string", "description": "The user's display name." },
-        "photoURL": { "type": "string", "format": "uri", "description": "URL of the user's profile picture." },
-        "role": { "type": "string", "enum": ["ADMIN", "DOCTOR", "PATIENT"], "description": "The user's role." }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role in the system (ADMIN, DOCTOR, PATIENT)."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The user's phone number."
+        }
       },
-      "required": ["uid", "email", "role"]
+      "required": [
+        "id",
+        "name",
+        "email",
+        "role",
+        "phone"
+      ]
     },
-    "PatientRecord": {
-      "title": "Patient Record",
-      "description": "Represents a single medical record for a patient's visit.",
+    "Patient": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Patient",
       "type": "object",
+      "description": "Represents a patient in the system.",
       "properties": {
-        "record_id": { "type": "string", "description": "Unique ID for the record." },
-        "patient_id": { "type": "string", "description": "ID of the patient." },
-        "doctor_id": { "type": "string", "description": "ID of the attending doctor." },
-        "visit_date": { "type": "string", "format": "date-time", "description": "Date and time of the consultation." },
-        "diagnosis": { "type": "string", "description": "Summary of the diagnosis." },
-        "prescription": { "type": "string", "description": "Medications prescribed." },
-        "notes": { "type": "string", "description": "Additional notes from the doctor." }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the patient.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:1 Patient)"
+        },
+        "age": {
+          "type": "number",
+          "description": "The patient's age."
+        },
+        "gender": {
+          "type": "string",
+          "description": "The patient's gender."
+        },
+        "medicalHistory": {
+          "type": "string",
+          "description": "The patient's medical history."
+        }
       },
-      "required": ["record_id", "patient_id", "doctor_id", "visit_date"]
+      "required": [
+        "id",
+        "userId",
+        "age",
+        "gender",
+        "medicalHistory"
+      ]
+    },
+    "Doctor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Doctor",
+      "type": "object",
+      "description": "Represents a doctor in the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the doctor.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:1 Doctor)"
+        },
+        "specialization": {
+          "type": "string",
+          "description": "The doctor's specialization."
+        },
+        "department": {
+          "type": "string",
+          "description": "The doctor's department."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "specialization",
+        "department"
+      ]
+    },
+    "Queue": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Queue",
+      "type": "object",
+      "description": "Represents a patient's position in the queue.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the queue entry.",
+          "format": "uuid"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "Reference to Doctor. (Relationship: Doctor 1:N Queue)"
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N Queue)"
+        },
+        "tokenNumber": {
+          "type": "number",
+          "description": "The token number assigned to the patient."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the patient in the queue (WAITING, IN_PROGRESS, COMPLETED)."
+        },
+        "estimatedWaitTime": {
+          "type": "number",
+          "description": "The estimated wait time for the patient (in minutes)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp when the queue entry was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "doctorId",
+        "patientId",
+        "tokenNumber",
+        "status",
+        "estimatedWaitTime",
+        "createdAt"
+      ]
     },
     "CaseStudy": {
-        "title": "Case Study",
-        "description": "Represents a medical case study.",
-        "type": "object",
-        "properties": {
-            "case_id": { "type": "string", "description": "Unique ID for the case study." },
-            "title": { "type": "string" },
-            "description": { "type": "string" },
-            "category": { "type": "string" },
-            "keywords": { "type": "array", "items": { "type": "string" } }
-        },
-        "required": ["case_id", "title", "description"]
-    },
-    "CaseStudyLink": {
-      "title": "Case Study Link",
-      "description": "Links a patient record to a case study.",
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CaseStudy",
       "type": "object",
+      "description": "Represents a case study documented by a doctor.",
       "properties": {
-        "link_id": { "type": "string", "description": "Unique ID for the link." },
-        "patient_id": { "type": "string", "description": "ID of the linked patient." },
-        "case_id": { "type": "string", "description": "ID of the linked case study." },
-        "relevance_score": { "type": "number", "description": "AI-calculated similarity score." }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the case study.",
+          "format": "uuid"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "Reference to Doctor. (Relationship: Doctor 1:N CaseStudy)"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the case study."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the case study."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the case study (e.g., disease, specialization)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp when the case study was created.",
+          "format": "date-time"
+        },
+        "isAnonymized": {
+          "type": "boolean",
+          "description": "Indicates whether the case study has been anonymized to protect patient privacy."
+        }
       },
-      "required": ["link_id", "patient_id", "case_id"]
+      "required": [
+        "id",
+        "doctorId",
+        "title",
+        "description",
+        "category",
+        "createdAt",
+        "isAnonymized"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a notification sent to a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the notification.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Notification)"
+        },
+        "message": {
+          "type": "string",
+          "description": "The content of the notification."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the notification (SENT, PENDING, FAILED)."
+        },
+        "sentAt": {
+          "type": "string",
+          "description": "The timestamp when the notification was sent.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "message",
+        "status",
+        "sentAt"
+      ]
     }
   },
   "auth": {
-    "providers": ["password"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Stores public-facing user profile information."
-    },
-    "/patients/{patientId}/records/{recordId}": {
-      "schema": { "$ref": "#/entities/PatientRecord" },
-      "description": "Stores medical records for a specific patient."
-    },
-    "/caseStudies/{caseId}": {
-        "schema": { "$ref": "#/entities/CaseStudy" },
-        "description": "Stores all medical case studies."
-    },
-    "/caseStudyLinks/{linkId}": {
-        "schema": { "$ref": "#/entities/CaseStudyLink" },
-        "description": "Stores links between patients and case studies."
-    }
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles.  The 'userId' parameter is the Firebase Authentication UID. No denormalized authorization fields are needed as access is based on the UID.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, matching the Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/patients/{patientId}",
+        "definition": {
+          "entityName": "Patient",
+          "schema": {
+            "$ref": "#/backend/entities/Patient"
+          },
+          "description": "Stores patient profiles associated with a user.  The 'userId' parameter is the Firebase Authentication UID, which links to the user profile. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (owner of the patient record)."
+            },
+            {
+              "name": "patientId",
+              "description": "The unique identifier for the patient."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/doctors/{doctorId}",
+        "definition": {
+          "entityName": "Doctor",
+          "schema": {
+            "$ref": "#/backend/entities/Doctor"
+          },
+          "description": "Stores doctor profiles associated with a user.  The 'userId' parameter is the Firebase Authentication UID, which links to the user profile. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (owner of the doctor record)."
+            },
+            {
+              "name": "doctorId",
+              "description": "The unique identifier for the doctor."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/queues/{queueId}",
+        "definition": {
+          "entityName": "Queue",
+          "schema": {
+            "$ref": "#/backend/entities/Queue"
+          },
+          "description": "Stores queue entries. Includes denormalized 'doctorId' and 'patientId' for authorization independence, allowing rules to check doctor and patient relationships directly.",
+          "params": [
+            {
+              "name": "queueId",
+              "description": "The unique identifier for the queue entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/case_studies/{caseStudyId}",
+        "definition": {
+          "entityName": "CaseStudy",
+          "schema": {
+            "$ref": "#/backend/entities/CaseStudy"
+          },
+          "description": "Stores case studies documented by doctors. Includes denormalized 'doctorId' for authorization independence, enabling rules to verify the doctor's ownership of the case study.",
+          "params": [
+            {
+              "name": "caseStudyId",
+              "description": "The unique identifier for the case study."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores notifications for users. The 'userId' parameter ensures that notifications are scoped to the user's ID, providing straightforward ownership-based security. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user receiving the notification."
+            },
+            {
+              "name": "notificationId",
+              "description": "The unique identifier for the notification."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the features of the MediQueue Pro application, prioritizing security, scalability, and debuggability as outlined in the design principles. It incorporates denormalization for authorization independence, structural segregation for homogeneous security postures, and standardized access modeling. This design avoids hierarchical authorization dependencies, ensuring atomic operations and simplified debugging. The design facilitates secure list operations (QAPs) through structural segregation and membership models.\n\n*   **Authorization Independence:** Achieved by denormalizing authorization data. For example, patient details necessary for queue operations are directly associated with the queue document, avoiding the need to fetch patient data during queue management. Similarly, Doctor details required for CaseStudy management is also present within the CaseStudy document.\n*   **Structural Segregation:** Different data types with different access requirements are stored in separate collections (e.g., `users`, `patients`, `doctors`, `queues`, `case_studies`, `notifications`).\n*   **Access Modeling:** User-owned data (`patients`, `doctors`, `notifications`) are stored under the `/users/{userId}` path. Collaborative data (if any) would use a membership map (`members: {uid1: 'role', uid2: 'role'}`). Global roles are managed via existence checks in dedicated collections like `/roles_admin/{uid}`.\n*   **QAPs (Rules are not Filters):**  Structural segregation ensures that list operations can be secured based on the collection being accessed. For instance, listing case studies will only return case studies that the user has permission to view.\n*   **Invariants:** The structure supports the integrity of ownership, timestamps, and denormalized data, for example, all records are linked to the user via userId field.\n\n"
   }
 }
