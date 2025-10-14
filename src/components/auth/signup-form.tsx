@@ -23,19 +23,29 @@ export function SignupForm() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would also collect other user details (like name)
-    // and create a user document in Firestore.
-    createUserWithEmailAndPassword(auth, email, password)
-      .catch((error) => {
-        console.error("Signup Error:", error);
-        toast({
-          variant: "destructive",
-          title: "Signup Failed",
-          description: error.message,
-        });
+    try {
+      // In a real app, you would also collect other user details (like name)
+      // and create a user document in Firestore.
+      await createUserWithEmailAndPassword(auth, email, password);
+      // The redirect will be handled by the useEffect hook
+    } catch (error: any) {
+      console.error("Signup Error:", error);
+      let description = "An unexpected error occurred. Please try again.";
+      if (error.code === 'auth/email-already-in-use') {
+        description = "This email is already registered. Please try logging in.";
+      } else if (error.code === 'auth/weak-password') {
+        description = "The password is too weak. Please use at least 6 characters.";
+      } else {
+        description = error.message;
+      }
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: description,
       });
+    }
   };
 
   return (
