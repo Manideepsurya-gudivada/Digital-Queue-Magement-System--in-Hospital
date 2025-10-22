@@ -52,16 +52,21 @@ export function LoginForm() {
     } catch (error: any) {
         // If it's a demo user and login fails, try creating the account.
         // `auth/invalid-credential` can mean user not found OR wrong password.
-        if (isDemoUser && (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential')) {
+        if (isDemoUser && error.code === 'auth/invalid-credential') {
             try {
                 await createUserWithEmailAndPassword(auth, email, loginPassword);
                 // After creation, login is handled automatically by onAuthStateChanged
             } catch (creationError: any) {
                  // This will fail if user exists (i.e. wrong password was the original error)
+                 // Or if the creation fails for another reason.
+                 let description = "An unexpected error occurred during account setup.";
+                 if (creationError.code === 'auth/email-already-in-use') {
+                    description = "Invalid email or password. Please try again.";
+                 }
                  toast({
                     variant: "destructive",
                     title: "Login Failed",
-                    description: "Invalid email or password. Please try again.",
+                    description: description,
                 });
             }
         } else {
@@ -69,6 +74,8 @@ export function LoginForm() {
             let description = "An unexpected error occurred. Please try again.";
             if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                 description = "Invalid email or password. Please try again.";
+            } else if (error.code === 'auth/user-not-found') {
+                description = "No account found with this email.";
             } else {
                 description = error.message;
             }
