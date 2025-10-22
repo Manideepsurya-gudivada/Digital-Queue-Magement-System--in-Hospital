@@ -22,6 +22,8 @@ import {
 import { queues as initialQueues, getPatientById } from "@/lib/data";
 import type { QueueItem } from "@/lib/data";
 import { AddCaseStudySheet } from "./add-case-study-sheet";
+import { useToast } from "@/hooks/use-toast";
+import { sendSmsNotification } from "@/ai/flows/send-sms-notification";
 
 interface PatientQueueTableProps {
   doctorId: string;
@@ -33,11 +35,42 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
   );
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const handleStatusChange = (queueId: string, status: 'IN_PROGRESS' | 'COMPLETED') => {
+  const handleStatusChange = async (queueId: string, status: 'IN_PROGRESS' | 'COMPLETED') => {
     setQueues(prevQueues =>
       prevQueues.map(q => (q.id === queueId ? { ...q, status } : q))
     );
+
+    if (status === 'IN_PROGRESS') {
+      // Find the current and next patient
+      const sortedQueues = [...queues].sort((a,b) => a.tokenNumber - b.tokenNumber);
+      const currentIndex = sortedQueues.findIndex(q => q.id === queueId);
+      const nextPatientInQueue = sortedQueues.find((q, index) => index > currentIndex && q.status === 'WAITING');
+
+      if (nextPatientInQueue) {
+        const patientDetails = getPatientById(nextPatientInQueue.patientId);
+        if (patientDetails && patientDetails.phone !== 'N/A') {
+          try {
+            await sendSmsNotification({
+              to: patientDetails.phone,
+              message: `Hi ${patientDetails.name}, you are next in the queue to see the doctor. Please be ready.`
+            });
+            toast({
+              title: "Notification Sent",
+              description: `An SMS has been sent to ${patientDetails.name} to inform them they are next.`,
+            });
+          } catch (error) {
+            console.error("Failed to send SMS:", error);
+            toast({
+              variant: "destructive",
+              title: "SMS Failed",
+              description: "Could not send notification to the next patient.",
+            });
+          }
+        }
+      }
+    }
   };
   
   const handleAddCaseStudy = (patientId: string) => {
