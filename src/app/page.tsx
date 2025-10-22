@@ -1,94 +1,24 @@
 'use client';
 
-import Image from 'next/image';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoginForm } from '@/components/auth/login-form';
-import { SignupForm } from '@/components/auth/signup-form';
 import { Logo } from '@/components/icons';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function AuthenticationPage() {
-  const bgImage = PlaceHolderImages.find(img => img.id === 'login-background');
-  
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-        {bgImage && (
-             <Image
-                src={bgImage.imageUrl}
-                alt={bgImage.description}
-                fill
-                className="object-cover"
-                data-ai-hint={bgImage.imageHint}
-             />
-        )}
-        <div className="relative z-20 flex items-center text-lg font-medium font-headline text-primary-foreground drop-shadow-lg">
-          <Logo className="mr-2 h-8 w-8 text-accent" />
-          MediQueue Pro
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600 p-4">
+      <div className="grid w-full max-w-4xl grid-cols-1 md:grid-cols-2 overflow-hidden rounded-2xl shadow-2xl">
+        <div className="hidden md:block bg-blue-300/50 backdrop-blur-lg p-12">
+            {/* You can add a nice graphic or message here */}
         </div>
-        <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2 bg-black/50 p-4 rounded-lg backdrop-blur-sm">
-            <p className="text-lg text-primary-foreground">
-              &ldquo;This platform has revolutionized our patient flow, reducing wait times by over 30%. It's intuitive for both our staff and patients.&rdquo;
-            </p>
-            <footer className="text-sm text-primary-foreground/80">Dr. Evelyn Reed</footer>
-          </blockquote>
-        </div>
-      </div>
-      <div className="lg:p-8 flex items-center justify-center w-full">
-        <Card className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] shadow-2xl">
-          <CardHeader className="space-y-1 text-center">
-            <div className="flex items-center justify-center text-lg font-medium font-headline">
-              <Logo className="mr-2 h-8 w-8 text-primary" />
+        <div className="bg-white p-8 sm:p-12">
+            <div className="flex flex-col items-center text-center">
+                 <Logo className="w-16 h-16 text-blue-600" />
+                <h1 className="mt-4 text-2xl font-bold text-blue-800 font-headline">
+                    HealthCare Hospitals
+                </h1>
             </div>
-            <CardTitle className="text-2xl font-headline">Welcome to MediQueue Pro</CardTitle>
-            <CardDescription>Select your role to sign in or create an account.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="patient" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="patient">I'm a Patient</TabsTrigger>
-                <TabsTrigger value="staff">I'm a Staff Member</TabsTrigger>
-              </TabsList>
-              <TabsContent value="patient" className="pt-4">
-                <Tabs defaultValue="login" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="login">Login</TabsTrigger>
-                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="login" className="pt-4">
-                    <LoginForm role="PATIENT" />
-                  </TabsContent>
-                  <TabsContent value="signup" className="pt-4">
-                    <SignupForm role="PATIENT" />
-                  </TabsContent>
-                </Tabs>
-              </TabsContent>
-              <TabsContent value="staff" className="pt-4">
-                 <Tabs defaultValue="doctor" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="doctor">Doctor</TabsTrigger>
-                      <TabsTrigger value="receptionist">Receptionist</TabsTrigger>
-                      <TabsTrigger value="admin">Admin</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="doctor" className="pt-4">
-                       <LoginForm role="DOCTOR" />
-                    </TabsContent>
-                    <TabsContent value="receptionist" className="pt-4">
-                      <LoginForm role="RECEPTIONIST" />
-                    </TabsContent>
-                     <TabsContent value="admin" className="pt-4">
-                       <LoginForm role="ADMIN" />
-                    </TabsContent>
-                 </Tabs>
-                <p className="px-8 text-center text-sm text-muted-foreground mt-4">
-                  Demo: Use `admin@mediqueue.pro`, `evelyn.reed@mediqueue.pro`, or `reception@mediqueue.pro` with password `password`.
-                </p>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+            <LoginForm />
+        </div>
       </div>
     </div>
   );
