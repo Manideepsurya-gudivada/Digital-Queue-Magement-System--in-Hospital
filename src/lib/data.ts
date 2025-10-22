@@ -54,6 +54,20 @@ export interface CaseStudy {
   image?: ImagePlaceholder;
 }
 
+export interface DepartmentMetric {
+  id: string;
+  name: string;
+  patientLoad: number;
+  avgWaitTime: number; // in minutes
+  doctorCount: number;
+}
+
+export interface Activity {
+  id: string;
+  description: string;
+  timestamp: string;
+}
+
 export const users: User[] = [
   { id: 'user-1', name: 'Admin User', email: 'admin@mediqueue.pro', role: 'ADMIN', phone: '123-456-7890', avatar: avatarImages[0] },
   { id: 'user-2', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7891', avatar: avatarImages[1] },
@@ -120,6 +134,20 @@ export const notifications = [
   { id: 'notif-1', message: 'Your appointment with Dr. Reed is next. Please proceed to Room 12.', time: '2m ago' },
   { id: 'notif-2', message: 'Dr. Green is running 15 minutes late. We apologize for the delay.', time: '30m ago' },
   { id: 'notif-3', message: 'Your prescription has been updated.', time: '1h ago' },
+];
+
+export const departmentMetrics: DepartmentMetric[] = [
+    { id: 'dept-1', name: 'Cardiology', patientLoad: 35, avgWaitTime: 22, doctorCount: 2 },
+    { id: 'dept-2', name: 'Neurology', patientLoad: 28, avgWaitTime: 18, doctorCount: 1 },
+    { id: 'dept-3', name: 'Orthopedics', patientLoad: 42, avgWaitTime: 35, doctorCount: 3 },
+    { id: 'dept-4', name: 'Pediatrics', patientLoad: 55, avgWaitTime: 15, doctorCount: 4 },
+];
+  
+export const recentActivities: Activity[] = [
+    { id: 'act-1', description: 'New patient John Smith registered for Cardiology.', timestamp: '5m ago' },
+    { id: 'act-2', description: 'Dr. Reed completed consultation with patient #101.', timestamp: '12m ago' },
+    { id: 'act-3', description: 'AI detected a high patient influx for Pediatrics.', timestamp: '25m ago' },
+    { id: 'act-4', description: 'A new case study on "Atypical Myocardial Infarction" was published.', timestamp: '45m ago' },
 ];
 
 export function getPatientById(id: string) {

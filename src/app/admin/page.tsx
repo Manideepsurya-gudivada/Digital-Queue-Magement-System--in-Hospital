@@ -9,6 +9,8 @@ import { DoctorManagementTable } from "@/components/admin/doctor-management-tabl
 import { useUser } from "@/firebase";
 import { users } from "@/lib/data";
 import { Skeleton } from '@/components/ui/skeleton';
+import { DepartmentPerformance } from '@/components/admin/department-performance';
+import { RecentActivity } from '@/components/admin/recent-activity';
 
 export default function AdminDashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -43,10 +45,16 @@ export default function AdminDashboardPage() {
     <DashboardLayout user={adminUser} pageTitle="Admin Analytics">
       <div className="flex flex-col gap-8">
         <StatsCards />
-        <div className="grid gap-8 lg:grid-cols-2">
-          <PatientFlowChart />
-          <DoctorManagementTable />
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <PatientFlowChart />
+          </div>
+          <div className="space-y-8">
+            <DepartmentPerformance />
+            <RecentActivity />
+          </div>
         </div>
+        <DoctorManagementTable />
       </div>
     </DashboardLayout>
   );
