@@ -21,14 +21,14 @@ export function LoginForm({ role }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { toast } = useToast();
+  
+  const isDemoUser = email === 'admin@mediqueue.pro' || email === 'evelyn.reed@mediqueue.pro';
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      // The logic to find a matched user from mock data is removed
-      // as we will rely on Firebase to determine roles later.
       if (email.startsWith('admin')) {
         router.push('/admin');
-      } else if (role === 'DOCTOR') {
+      } else if (role === 'DOCTOR' || email.startsWith('evelyn')) {
         router.push('/doctor');
       } else {
         router.push('/dashboard');
@@ -38,9 +38,10 @@ export function LoginForm({ role }: LoginFormProps) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const loginPassword = isDemoUser ? 'password' : password;
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // The redirect will be handled by the useEffect hook
+      await signInWithEmailAndPassword(auth, email, loginPassword);
     } catch (error: any) {
       console.error("Login Error:", error);
       let description = "An unexpected error occurred. Please try again.";
@@ -76,8 +77,9 @@ export function LoginForm({ role }: LoginFormProps) {
           id={`password-login-${role}`} 
           type="password" 
           required 
-          value={password}
+          value={isDemoUser ? 'password' : password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={isDemoUser}
         />
       </div>
       <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">

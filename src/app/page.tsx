@@ -68,7 +68,7 @@ export default function AuthenticationPage() {
               <TabsContent value="staff" className="pt-4">
                 <LoginForm role="DOCTOR" />
                 <p className="px-8 text-center text-sm text-muted-foreground mt-4">
-                  Demo Login: `admin@mediqueue.pro` or `evelyn.reed@mediqueue.pro`
+                  Demo Login: `admin@mediqueue.pro` or `evelyn.reed@mediqueue.pro` with password `password`.
                 </p>
               </TabsContent>
             </Tabs>
