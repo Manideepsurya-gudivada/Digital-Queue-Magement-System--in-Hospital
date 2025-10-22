@@ -2,21 +2,20 @@
 
 import { LoginForm } from '@/components/auth/login-form';
 import { Logo } from '@/components/icons';
-import { HospitalInfoWidget } from '@/components/auth/hospital-info-widget';
 
 export default function AuthenticationPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600 p-4">
-      <div className="grid w-full max-w-4xl grid-cols-1 md:grid-cols-2 overflow-hidden rounded-2xl shadow-2xl">
-        <div className="hidden md:block bg-blue-300/50 backdrop-blur-lg p-12">
-            <HospitalInfoWidget />
-        </div>
-        <div className="bg-white p-8 sm:p-12">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-sm">
+        <div className="bg-white p-8 sm:p-12 rounded-lg shadow-lg">
             <div className="flex flex-col items-center text-center">
-                 <Logo className="w-16 h-16 text-blue-600" />
-                <h1 className="mt-4 text-2xl font-bold text-blue-800 font-headline">
-                    HealthCare Hospitals
+                 <div className="bg-primary p-3 rounded-full mb-4">
+                    <Logo className="w-10 h-10 text-primary-foreground" />
+                 </div>
+                <h1 className="mt-2 text-2xl font-bold text-primary font-headline">
+                    HealthCare
                 </h1>
+                <p className="text-muted-foreground text-sm mt-1">Hospital Management System</p>
             </div>
             <LoginForm />
         </div>

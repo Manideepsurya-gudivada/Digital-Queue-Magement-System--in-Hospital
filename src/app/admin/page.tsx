@@ -3,14 +3,31 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { StatsCards } from "@/components/admin/stats-cards";
-import { PatientFlowChart } from "@/components/admin/patient-flow-chart";
-import { DoctorManagementTable } from "@/components/admin/doctor-management-table";
 import { useUser } from "@/firebase";
 import { users } from "@/lib/data";
 import { Skeleton } from '@/components/ui/skeleton';
-import { DepartmentPerformance } from '@/components/admin/department-performance';
-import { RecentActivity } from '@/components/admin/recent-activity';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users as UsersIcon, CalendarCheck, Stethoscope } from 'lucide-react';
+import { WeeklyAppointmentsChart } from '@/components/admin/weekly-appointments-chart';
+import { RecentAppointmentsTable } from '@/components/admin/recent-appointments-table';
+
+const stats = [
+  {
+    title: 'Total Users',
+    value: '0',
+    icon: <UsersIcon className="h-8 w-8 text-purple-600" />,
+  },
+  {
+    title: 'Appointments',
+    value: '0',
+    icon: <CalendarCheck className="h-8 w-8 text-green-500" />,
+  },
+  {
+    title: 'Doctors',
+    value: '0',
+    icon: <Stethoscope className="h-8 w-8 text-yellow-500" />,
+  },
+];
 
 export default function AdminDashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -19,6 +36,13 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/');
+    } else {
+      const currentUser = users.find(u => u.email === user?.email);
+      if (currentUser?.role !== 'ADMIN') {
+        // Or redirect to their specific dashboard
+        // For now, redirecting to login
+        router.push('/');
+      }
     }
   }, [user, isUserLoading, router]);
 
@@ -26,36 +50,38 @@ export default function AdminDashboardPage() {
 
   if (isUserLoading || !user || !adminUser) {
     return (
-      <div className="p-8">
-        <Skeleton className="h-16 w-1/2 mb-8" />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-        </div>
-        <div className="grid gap-8 lg:grid-cols-2">
-            <Skeleton className="h-96" />
-            <Skeleton className="h-96" />
-        </div>
+      <div className="flex h-screen w-full items-center justify-center">
+        <Skeleton className="h-screen w-full" />
       </div>
     );
   }
 
   return (
-    <DashboardLayout user={adminUser} pageTitle="Admin Analytics">
-      <div className="flex flex-col gap-8">
-        <StatsCards />
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <PatientFlowChart />
-          </div>
-          <div className="space-y-8">
-            <DepartmentPerformance />
-            <RecentActivity />
-          </div>
+    <DashboardLayout user={adminUser} pageTitle="Dashboard">
+        <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {stats.map((stat) => (
+                <Card key={stat.title}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                    {stat.icon}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+                <div className="lg:col-span-3">
+                    <WeeklyAppointmentsChart />
+                </div>
+                <div className="lg:col-span-2">
+                    <RecentAppointmentsTable />
+                </div>
+            </div>
         </div>
-        <DoctorManagementTable />
-      </div>
     </DashboardLayout>
   );
 }

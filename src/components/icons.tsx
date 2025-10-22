@@ -4,12 +4,13 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
+      viewBox="0 0 256 256"
+      width="1em"
+      height="1em"
       fill="currentColor"
       {...props}
     >
-        <path d="M20 8l-8-7-8 7v11a2 2 0 002 2h12a2 2 0 002-2V8z" fill="#fff" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M13 16h-2v-3H8v-2h3V8h2v3h3v2h-3v3z" fill="currentColor" stroke="none" />
+      <path d="M128 24a104 104 0 10104 104A104.11 104.11 0 00128 24zm-8 152v-40H80a8 8 0 010-16h40v-40a8 8 0 0116 0v40h40a8 8 0 010 16h-40v40a8 8 0 01-16 0z" />
     </svg>
   );
 }
