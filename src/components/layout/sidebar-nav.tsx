@@ -11,7 +11,9 @@ import {
   Building,
   HeartPulse, 
   FileText, 
-  Settings 
+  Settings,
+  BookUser,
+  BrainCircuit
 } from "lucide-react";
 import type { UserRole } from "@/lib/data";
 
@@ -19,31 +21,46 @@ interface SidebarNavProps {
   role: UserRole;
 }
 
-const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/users", label: "Users", icon: Users },
-  { href: "/appointments", label: "Appointments", icon: CalendarCheck },
-  { href: "/doctors", label: "Doctors", icon: Stethoscope },
-  { href: "/departments", label: "Departments", icon: Building },
-  { href: "/patients", label: "Patients", icon: HeartPulse },
-  { href: "/reports", label: "Reports", icon: FileText },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+const allNavItems = {
+  ADMIN: [
+    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/appointments", label: "Appointments", icon: CalendarCheck },
+    { href: "/users", label: "Users", icon: Users },
+    { href: "/doctors", label: "Doctors", icon: Stethoscope },
+    { href: "/departments", label: "Departments", icon: Building },
+    { href: "/predict", label: "AI Predictor", icon: BrainCircuit },
+  ],
+  DOCTOR: [
+    { href: "/doctor", label: "Patient Queue", icon: Users },
+    { href: "/case-studies", label: "Case Studies", icon: FileText },
+    { href: "/profile", label: "Profile", icon: Settings },
+  ],
+  PATIENT: [
+    { href: "/dashboard", label: "My Dashboard", icon: LayoutDashboard },
+    { href: "/profile", label: "Profile", icon: Settings },
+  ],
+  RECEPTIONIST: [
+      { href: "/receptionist", label: "Registration", icon: BookUser },
+  ]
+};
+
+const roleTitles = {
+    ADMIN: "Admin Panel",
+    DOCTOR: "Doctor Menu",
+    PATIENT: "Patient Menu",
+    RECEPTIONIST: "Reception Menu"
+}
 
 export function SidebarNav({ role }: SidebarNavProps) {
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
 
-  // For this redesign, we'll assume the admin sees all links.
-  // We can add role-based filtering later if needed.
-  if (role !== 'ADMIN') {
-    // You can define different nav items for other roles here
-    return null;
-  }
+  const navItems = allNavItems[role] || [];
+  const title = roleTitles[role] || "Menu";
   
   return (
     <nav className="flex flex-col p-4 space-y-2">
-      <p className="px-3 text-sm font-semibold text-white/50">Admin Panel</p>
+      <p className="px-3 text-sm font-semibold text-white/50">{title}</p>
       {navItems.map(item => (
         <Link 
           key={item.label}
