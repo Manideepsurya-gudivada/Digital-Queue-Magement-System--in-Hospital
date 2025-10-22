@@ -20,6 +20,7 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       const demoUsers = [
         { email: 'admin@mediqueue.pro', password: 'password' },
         { email: 'evelyn.reed@mediqueue.pro', password: 'password' },
+        { email: 'reception@mediqueue.pro', password: 'password' },
       ];
 
       for (const demoUser of demoUsers) {

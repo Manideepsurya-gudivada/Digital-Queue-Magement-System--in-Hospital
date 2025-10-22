@@ -3,7 +3,7 @@ import { PlaceHolderImages } from './placeholder-images';
 
 const avatarImages = PlaceHolderImages.filter(img => img.id.startsWith('avatar'));
 
-export type UserRole = 'ADMIN' | 'DOCTOR' | 'PATIENT';
+export type UserRole = 'ADMIN' | 'DOCTOR' | 'PATIENT' | 'RECEPTIONIST';
 
 export interface User {
   id: string;
@@ -25,6 +25,10 @@ export interface Doctor extends User {
   role: 'DOCTOR';
   specialization: string;
   department: string;
+}
+
+export interface Receptionist extends User {
+  role: 'RECEPTIONIST';
 }
 
 export interface Admin extends User {
@@ -76,6 +80,7 @@ export const users: User[] = [
   { id: 'user-5', name: 'Jane Smith', email: 'jane.smith@mediqueue.pro', role: 'PATIENT', phone: '123-456-7894', avatar: avatarImages[4] },
   { id: 'user-6', name: 'Emily White', email: 'emily.white@mediqueue.pro', role: 'PATIENT', phone: '123-456-7895', avatar: avatarImages[0] },
   { id: 'user-7', name: 'Michael Brown', email: 'michael.brown@mediqueue.pro', role: 'PATIENT', phone: '123-456-7896', avatar: avatarImages[1] },
+  { id: 'user-8', name: 'Receptionist User', email: 'reception@mediqueue.pro', role: 'RECEPTIONIST', phone: '123-456-7897', avatar: avatarImages[2] },
 ];
 
 export const doctors: Doctor[] = [

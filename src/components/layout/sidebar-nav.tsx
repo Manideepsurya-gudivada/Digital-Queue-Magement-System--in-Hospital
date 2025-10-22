@@ -9,7 +9,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { BarChart3, Bot, FileText, LayoutDashboard, Stethoscope, Users } from "lucide-react";
+import { BarChart3, Bot, FileText, LayoutDashboard, Stethoscope, Users, UserPlus } from "lucide-react";
 import type { UserRole } from "@/lib/data";
 
 interface SidebarNavProps {
@@ -51,9 +51,28 @@ export function SidebarNav({ role }: SidebarNavProps) {
       </SidebarMenuItem>
     </>
   );
+  
+  const receptionistNav = (
+     <SidebarMenuItem>
+        <Link href="/receptionist">
+          <SidebarMenuButton isActive={isActive('/receptionist')} tooltip="Patient Registration">
+            <UserPlus />
+            <span>Registration</span>
+          </SidebarMenuButton>
+        </Link>
+      </SidebarMenuItem>
+  );
 
   const adminNav = (
     <>
+       <SidebarMenuItem>
+        <Link href="/receptionist">
+          <SidebarMenuButton isActive={isActive('/receptionist')} tooltip="Patient Registration">
+            <UserPlus />
+            <span>Registration</span>
+          </SidebarMenuButton>
+        </Link>
+      </SidebarMenuItem>
       <SidebarMenuItem>
         <Link href="/admin">
           <SidebarMenuButton isActive={isActive('/admin')} tooltip="Analytics">
@@ -87,6 +106,8 @@ export function SidebarNav({ role }: SidebarNavProps) {
         return patientNav;
       case 'DOCTOR':
         return doctorNav;
+       case 'RECEPTIONIST':
+        return receptionistNav;
       case 'ADMIN':
         return adminNav;
       default:

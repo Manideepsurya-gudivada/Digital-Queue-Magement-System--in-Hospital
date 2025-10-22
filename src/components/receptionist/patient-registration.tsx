@@ -1,0 +1,130 @@
+'use client';
+
+import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { doctors, patients, queues } from '@/lib/data';
+import type { Patient, QueueItem } from '@/lib/data';
+
+interface PatientRegistrationProps {
+  onPatientRegistered: (newQueueItem: QueueItem) => void;
+}
+
+export function PatientRegistration({ onPatientRegistered }: PatientRegistrationProps) {
+  const [patientName, setPatientName] = useState('');
+  const [patientAge, setPatientAge] = useState('');
+  const [patientGender, setPatientGender] = useState('');
+  const [doctorId, setDoctorId] = useState('');
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!patientName || !patientAge || !patientGender || !doctorId) {
+      toast({
+        variant: 'destructive',
+        title: 'Missing Information',
+        description: 'Please fill out all fields to register a patient.',
+      });
+      return;
+    }
+
+    // In a real app, you'd save the new patient to Firestore.
+    // For now, we'll create them in our mock data.
+    const newPatient: Patient = {
+      id: `pat-${uuidv4()}`,
+      name: patientName,
+      age: parseInt(patientAge, 10),
+      gender: patientGender as 'Male' | 'Female' | 'Other',
+      email: `${patientName.toLowerCase().replace(' ', '.')}@mediqueue.pro`,
+      role: 'PATIENT',
+      phone: 'N/A',
+      medicalHistory: 'None',
+      avatar: { id: 'avatar-1', imageUrl: 'https://picsum.photos/seed/avatar1/100/100', description: 'avatar', imageHint: 'person' },
+    };
+    patients.push(newPatient);
+
+    const doctorQueues = queues.filter(q => q.doctorId === doctorId);
+    const lastToken = Math.max(0, ...doctorQueues.map(q => q.tokenNumber));
+    const newTokenNumber = lastToken + 1;
+
+    const newQueueItem: QueueItem = {
+      id: `q-${uuidv4()}`,
+      patientId: newPatient.id,
+      doctorId: doctorId,
+      tokenNumber: newTokenNumber,
+      status: 'WAITING',
+      estimatedWaitTime: doctorQueues.filter(q => q.status === 'WAITING').length * 15,
+      createdAt: new Date().toISOString(),
+    };
+    queues.push(newQueueItem);
+    onPatientRegistered(newQueueItem);
+
+    toast({
+      title: 'Patient Registered',
+      description: `${patientName} has been assigned token #${newTokenNumber} for Dr. ${doctors.find(d => d.id === doctorId)?.name}.`,
+    });
+
+    // Reset form
+    setPatientName('');
+    setPatientAge('');
+    setPatientGender('');
+    setDoctorId('');
+  };
+
+  return (
+    <Card>
+      <form onSubmit={handleSubmit}>
+        <CardHeader>
+          <CardTitle>New Patient Registration</CardTitle>
+          <CardDescription>Register a new patient and add them to a queue.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="patient-name">Patient Name</Label>
+            <Input id="patient-name" value={patientName} onChange={(e) => setPatientName(e.target.value)} placeholder="e.g., John Doe" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="patient-age">Age</Label>
+              <Input id="patient-age" type="number" value={patientAge} onChange={(e) => setPatientAge(e.target.value)} placeholder="e.g., 35" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="patient-gender">Gender</Label>
+              <Select value={patientGender} onValueChange={setPatientGender}>
+                <SelectTrigger id="patient-gender">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="doctor">Assign to Doctor</Label>
+            <Select value={doctorId} onValueChange={setDoctorId}>
+              <SelectTrigger id="doctor">
+                <SelectValue placeholder="Select a doctor..." />
+              </SelectTrigger>
+              <SelectContent>
+                {doctors.map(doc => (
+                  <SelectItem key={doc.id} value={doc.id}>{doc.name} - {doc.specialization}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" className="w-full">Register and Generate Token</Button>
+        </CardFooter>
+      </form>
+    </Card>
+  );
+}

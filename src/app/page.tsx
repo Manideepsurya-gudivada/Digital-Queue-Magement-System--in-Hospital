@@ -49,7 +49,7 @@ export default function AuthenticationPage() {
             <Tabs defaultValue="patient" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="patient">I'm a Patient</TabsTrigger>
-                <TabsTrigger value="staff">I'm a Doctor / Admin</TabsTrigger>
+                <TabsTrigger value="staff">I'm a Staff Member</TabsTrigger>
               </TabsList>
               <TabsContent value="patient" className="pt-4">
                 <Tabs defaultValue="login" className="w-full">
@@ -66,9 +66,24 @@ export default function AuthenticationPage() {
                 </Tabs>
               </TabsContent>
               <TabsContent value="staff" className="pt-4">
-                <LoginForm role="DOCTOR" />
+                 <Tabs defaultValue="doctor" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="doctor">Doctor</TabsTrigger>
+                      <TabsTrigger value="receptionist">Receptionist</TabsTrigger>
+                      <TabsTrigger value="admin">Admin</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="doctor" className="pt-4">
+                       <LoginForm role="DOCTOR" />
+                    </TabsContent>
+                    <TabsContent value="receptionist" className="pt-4">
+                      <LoginForm role="RECEPTIONIST" />
+                    </TabsContent>
+                     <TabsContent value="admin" className="pt-4">
+                       <LoginForm role="ADMIN" />
+                    </TabsContent>
+                 </Tabs>
                 <p className="px-8 text-center text-sm text-muted-foreground mt-4">
-                  Demo Login: `admin@mediqueue.pro` or `evelyn.reed@mediqueue.pro` with password `password`.
+                  Demo: Use `admin@mediqueue.pro`, `evelyn.reed@mediqueue.pro`, or `reception@mediqueue.pro` with password `password`.
                 </p>
               </TabsContent>
             </Tabs>

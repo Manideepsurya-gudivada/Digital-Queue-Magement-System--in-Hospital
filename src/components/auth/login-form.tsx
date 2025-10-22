@@ -22,15 +22,22 @@ export function LoginForm({ role }: LoginFormProps) {
   const [password, setPassword] = useState('');
   const { toast } = useToast();
   
-  const isDemoUser = email === 'admin@mediqueue.pro' || email === 'evelyn.reed@mediqueue.pro';
+  const isDemoUser = email === 'admin@mediqueue.pro' || email === 'evelyn.reed@mediqueue.pro' || email === 'reception@mediqueue.pro';
 
   useEffect(() => {
     if (!isUserLoading && user) {
       if (email.startsWith('admin')) {
         router.push('/admin');
+      } else if (email.startsWith('reception')) {
+        router.push('/receptionist');
       } else if (role === 'DOCTOR' || email.startsWith('evelyn')) {
         router.push('/doctor');
-      } else {
+      } else if (role === 'ADMIN') {
+        router.push('/admin');
+      } else if (role === 'RECEPTIONIST') {
+        router.push('/receptionist');
+      }
+       else {
         router.push('/dashboard');
       }
     }
