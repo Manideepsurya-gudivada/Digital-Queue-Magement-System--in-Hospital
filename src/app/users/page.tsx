@@ -1,19 +1,31 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useUser } from "@/firebase";
-import { users } from "@/lib/data";
+import { users as initialUsers, User } from "@/lib/data";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { PatientRegistration } from '@/components/admin/patient-registration';
 
 export default function UsersPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>(initialUsers);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -24,7 +36,7 @@ export default function UsersPage() {
         router.push('/');
       }
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, users]);
 
   const adminUser = users.find(u => u.role === 'ADMIN');
 
@@ -49,12 +61,23 @@ export default function UsersPage() {
       }
   }
 
+  const handlePatientRegistered = (newPatient: User) => {
+    setUsers(prevUsers => [...prevUsers, newPatient]);
+    setIsDialogOpen(false);
+  };
+
   return (
     <DashboardLayout user={adminUser} pageTitle="User Management">
       <Card>
-        <CardHeader>
-          <CardTitle>All Users</CardTitle>
-          <CardDescription>A list of all users in the system.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>All Users</CardTitle>
+            <CardDescription>A list of all users in the system.</CardDescription>
+          </div>
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add User
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -87,6 +110,18 @@ export default function UsersPage() {
           </Table>
         </CardContent>
       </Card>
+      
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Register New Patient</DialogTitle>
+            <DialogDescription>
+              Fill out the form below to add a new patient to the system.
+            </DialogDescription>
+          </DialogHeader>
+          <PatientRegistration onPatientRegistered={handlePatientRegistered} />
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
