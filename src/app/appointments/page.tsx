@@ -53,7 +53,8 @@ export default function AppointmentsPage() {
   }
   
   const handlePatientRegistered = (newQueueItem: QueueItem) => {
-    setQueues(prevQueues => [...prevQueues, newQueueItem]);
+    // We only need to update the state. The mock data is already updated in the form component.
+    setQueues(prevQueues => [...prevQueues.filter(q => q.id !== newQueueItem.id), newQueueItem]);
     setIsDialogOpen(false);
   };
 
@@ -97,7 +98,7 @@ export default function AppointmentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {queues
+              {[...queues]
                 .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                 .map((item) => {
                 const patient = getPatientById(item.patientId);
@@ -124,7 +125,7 @@ export default function AppointmentsPage() {
               Fill out the form below to add a new patient to a doctor's queue.
             </DialogDescription>
           </DialogHeader>
-          <PatientRegistration onPatientRegistered={handlePatientRegistered} />
+          <PatientRegistration onPatientRegistered={handlePatientRegistered} formType='dialog' />
         </DialogContent>
       </Dialog>
     </DashboardLayout>

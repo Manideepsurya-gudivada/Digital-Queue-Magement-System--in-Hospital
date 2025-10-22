@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useUser } from "@/firebase";
-import { users } from '@/lib/data';
+import { users, queues as initialQueues } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PatientRegistration } from '@/components/shared/patient-registration';
 import { ReceptionQueueTable } from '@/components/receptionist/reception-queue-table';
@@ -13,7 +13,7 @@ import { QueueItem } from '@/lib/data';
 export default function ReceptionistDashboardPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
-  const [queues, setQueues] = useState<QueueItem[]>([]);
+  const [queues, setQueues] = useState<QueueItem[]>(initialQueues);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -36,7 +36,8 @@ export default function ReceptionistDashboardPage() {
   }
 
   const handlePatientRegistered = (newQueueItem: QueueItem) => {
-    setQueues(prevQueues => [...prevQueues, newQueueItem]);
+    // We only need to update the state. The mock data is already updated in the form component.
+    setQueues(prevQueues => [...prevQueues.filter(q => q.id !== newQueueItem.id), newQueueItem]);
   };
 
   return (

@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { queues as initialMockQueues, getPatientById, getDoctorById } from "@/lib/data";
+import { getPatientById, getDoctorById } from "@/lib/data";
 import type { QueueItem } from "@/lib/data";
 
 interface ReceptionQueueTableProps {
@@ -20,10 +20,10 @@ interface ReceptionQueueTableProps {
 }
 
 export function ReceptionQueueTable({ initialQueues }: ReceptionQueueTableProps) {
-  const [queues, setQueues] = useState<QueueItem[]>(initialMockQueues);
+  const [queues, setQueues] = useState<QueueItem[]>(initialQueues);
 
   useEffect(() => {
-    setQueues(prevQueues => [...initialMockQueues, ...initialQueues.filter(iq => !prevQueues.some(pq => pq.id === iq.id))]);
+    setQueues(initialQueues);
   }, [initialQueues]);
 
   const getStatusBadge = (status: QueueItem['status']) => {
@@ -57,7 +57,7 @@ export function ReceptionQueueTable({ initialQueues }: ReceptionQueueTableProps)
                 </TableRow>
                 </TableHeader>
                 <TableBody>
-                {queues
+                {[...queues]
                     .sort((a,b) => a.tokenNumber - b.tokenNumber)
                     .map((item) => {
                     const patient = getPatientById(item.patientId);
