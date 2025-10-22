@@ -20,6 +20,7 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
   const [patientName, setPatientName] = useState('');
   const [patientAge, setPatientAge] = useState('');
   const [patientGender, setPatientGender] = useState('');
+  const [patientPhone, setPatientPhone] = useState('');
   const [doctorId, setDoctorId] = useState('');
   const { toast } = useToast();
 
@@ -43,7 +44,7 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
       gender: patientGender as 'Male' | 'Female' | 'Other',
       email: `${patientName.toLowerCase().replace(' ', '.')}@mediqueue.pro`,
       role: 'PATIENT',
-      phone: 'N/A',
+      phone: patientPhone || 'N/A',
       medicalHistory: 'None',
       avatar: { id: 'avatar-1', imageUrl: 'https://picsum.photos/seed/avatar1/100/100', description: 'avatar', imageHint: 'person' },
     };
@@ -74,6 +75,7 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
     setPatientName('');
     setPatientAge('');
     setPatientGender('');
+    setPatientPhone('');
     setDoctorId('');
   };
 
@@ -102,6 +104,10 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
               </SelectContent>
             </Select>
           </div>
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="patient-phone">Phone Number (Optional)</Label>
+            <Input id="patient-phone" type="tel" value={patientPhone} onChange={(e) => setPatientPhone(e.target.value)} placeholder="e.g., 123-456-7890" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="doctor">Assign to Doctor</Label>
