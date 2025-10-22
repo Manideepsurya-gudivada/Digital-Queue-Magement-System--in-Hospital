@@ -35,6 +35,12 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
       return;
     }
 
+    const doctor = doctors.find(d => d.id === doctorId);
+    if (!doctor) {
+        toast({ variant: 'destructive', title: 'Invalid Doctor', description: 'Please select a valid doctor.' });
+        return;
+    }
+
     // In a real app, you'd save the new patient to Firestore.
     // For now, we'll create them in our mock data.
     const newPatient: Patient = {
@@ -51,8 +57,12 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
     patients.push(newPatient);
 
     const doctorQueues = queues.filter(q => q.doctorId === doctorId);
-    const lastToken = Math.max(0, ...doctorQueues.map(q => q.tokenNumber));
-    const newTokenNumber = lastToken + 1;
+    const lastTokenNum = Math.max(0, ...doctorQueues.map(q => {
+        const num = parseInt(q.tokenNumber.split('-')[1]);
+        return isNaN(num) ? 0 : num;
+    }));
+    const newTokenNumber = `${doctor.department.charAt(0).toUpperCase()}-${String(lastTokenNum + 1).padStart(3, '0')}`;
+
 
     const newQueueItem: QueueItem = {
       id: `q-${uuidv4()}`,
@@ -68,7 +78,7 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
 
     toast({
       title: 'Patient Registered',
-      description: `${patientName} has been assigned token #${newTokenNumber} for Dr. ${doctors.find(d => d.id === doctorId)?.name}.`,
+      description: `${patientName} has been assigned token #${newTokenNumber} for Dr. ${doctor.name}.`,
     });
 
     // Reset form

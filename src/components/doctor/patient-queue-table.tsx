@@ -44,7 +44,11 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
 
     if (status === 'IN_PROGRESS') {
       // Find the current and next patient
-      const sortedQueues = [...queues].sort((a,b) => a.tokenNumber - b.tokenNumber);
+      const sortedQueues = [...queues].sort((a,b) => {
+        const aNum = parseInt(a.tokenNumber.split('-')[1]);
+        const bNum = parseInt(b.tokenNumber.split('-')[1]);
+        return aNum - bNum;
+      });
       const currentIndex = sortedQueues.findIndex(q => q.id === queueId);
       const nextPatientInQueue = sortedQueues.find((q, index) => index > currentIndex && q.status === 'WAITING');
 
@@ -107,7 +111,11 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
         </TableHeader>
         <TableBody>
           {queues
-            .sort((a,b) => a.tokenNumber - b.tokenNumber)
+            .sort((a,b) => {
+                const aNum = parseInt(a.tokenNumber.split('-')[1]);
+                const bNum = parseInt(b.tokenNumber.split('-')[1]);
+                return aNum - bNum;
+            })
             .map((item) => {
             const patient = getPatientById(item.patientId);
             return (

@@ -41,7 +41,7 @@ export interface QueueItem {
   id: string;
   patientId: string;
   doctorId: string;
-  tokenNumber: number;
+  tokenNumber: string;
   status: QueueStatus;
   estimatedWaitTime: number; // in minutes
   createdAt: string;
@@ -79,28 +79,41 @@ export const users: User[] = [
   { id: 'user-4', name: 'Dr. Samuel Green', email: 'samuel.green@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7893', avatar: avatarImages[3] },
   { id: 'user-5', name: 'Jane Smith', email: 'jane.smith@mediqueue.pro', role: 'PATIENT', phone: '123-456-7894', avatar: avatarImages[4] },
   { id: 'user-6', name: 'Emily White', email: 'emily.white@mediqueue.pro', role: 'PATIENT', phone: '123-456-7895', avatar: avatarImages[0] },
-  { id: 'user-7', name: 'Michael Brown', email: 'michael.brown@mediqueue.pro', role: 'PATIENT', phone: '123-456-7896', avatar: avatarImages[1] },
+  { id: 'user-7', name: 'Robert Brown', email: 'michael.brown@mediqueue.pro', role: 'PATIENT', phone: '123-456-7896', avatar: avatarImages[1] },
   { id: 'user-8', name: 'Receptionist User', email: 'reception@mediqueue.pro', role: 'RECEPTIONIST', phone: '123-456-7897', avatar: avatarImages[2] },
+  { id: 'user-9', name: 'Dr. Alan Turing', email: 'alan.turing@mediqueue.pro', role: 'DOCTOR', phone: '123-456-1111', avatar: avatarImages[4] },
+  { id: 'user-10', name: 'Alice Johnson', email: 'alice.j@mediqueue.pro', role: 'PATIENT', phone: '111-222-3333', avatar: avatarImages[0] },
+  { id: 'user-11', name: 'Dr. Grace Hopper', email: 'grace.hopper@mediqueue.pro', role: 'DOCTOR', phone: '123-456-2222', avatar: avatarImages[1] },
 ];
 
 export const doctors: Doctor[] = [
   { id: 'doc-1', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7891', avatar: avatarImages[1], specialization: 'Cardiology', department: 'Cardiology' },
   { id: 'doc-2', name: 'Dr. Samuel Green', email: 'samuel.green@mediqueue.pro', role: 'DOCTOR', phone: '123-456-7893', avatar: avatarImages[3], specialization: 'Neurology', department: 'Neurology' },
+  { id: 'doc-3', name: 'Dr. Alan Turing', email: 'alan.turing@mediqueue.pro', role: 'DOCTOR', phone: '123-456-1111', avatar: avatarImages[4], specialization: 'Pediatrics', department: 'Pediatrics' },
+  { id: 'doc-4', name: 'Dr. Grace Hopper', email: 'grace.hopper@mediqueue.pro', role: 'DOCTOR', phone: '123-456-2222', avatar: avatarImages[1], specialization: 'ENT', department: 'ENT' },
 ];
 
 export const patients: Patient[] = [
   { id: 'pat-1', name: 'John Doe', email: 'john.doe@mediqueue.pro', role: 'PATIENT', phone: '123-456-7892', avatar: avatarImages[2], age: 45, gender: 'Male', medicalHistory: 'Hypertension' },
   { id: 'pat-2', name: 'Jane Smith', email: 'jane.smith@mediqueue.pro', role: 'PATIENT', phone: '123-456-7894', avatar: avatarImages[4], age: 34, gender: 'Female', medicalHistory: 'Asthma' },
   { id: 'pat-3', name: 'Emily White', email: 'emily.white@mediqueue.pro', role: 'PATIENT', phone: '123-456-7895', avatar: avatarImages[0], age: 28, gender: 'Female', medicalHistory: 'None' },
-  { id: 'pat-4', name: 'Michael Brown', email: 'michael.brown@mediqueue.pro', role: 'PATIENT', phone: '123-456-7896', avatar: avatarImages[1], age: 52, gender: 'Male', medicalHistory: 'Diabetes Type 2' },
+  { id: 'pat-4', name: 'Robert Brown', email: 'michael.brown@mediqueue.pro', role: 'PATIENT', phone: '123-456-7896', avatar: avatarImages[1], age: 52, gender: 'Male', medicalHistory: 'Diabetes Type 2' },
+  { id: 'pat-5', name: 'Alice Johnson', email: 'alice.j@mediqueue.pro', role: 'PATIENT', phone: '111-222-3333', avatar: avatarImages[0], age: 29, gender: 'Female', medicalHistory: 'None' },
 ];
 
 export const queues: QueueItem[] = [
-  { id: 'q-1', patientId: 'pat-1', doctorId: 'doc-1', tokenNumber: 101, status: 'IN_PROGRESS', estimatedWaitTime: 0, createdAt: new Date('2025-10-22T22:54:00Z').toISOString() },
-  { id: 'q-2', patientId: 'pat-2', doctorId: 'doc-1', tokenNumber: 102, status: 'WAITING', estimatedWaitTime: 15, createdAt: new Date('2025-10-22T22:59:00Z').toISOString() },
-  { id: 'q-3', patientId: 'pat-3', doctorId: 'doc-1', tokenNumber: 103, status: 'WAITING', estimatedWaitTime: 25, createdAt: new Date('2025-10-22T23:02:00Z').toISOString() },
-  { id: 'q-4', patientId: 'pat-4', doctorId: 'doc-2', tokenNumber: 201, status: 'COMPLETED', estimatedWaitTime: 0, createdAt: new Date('2025-10-22T22:04:00Z').toISOString() },
+  // C-001 for John Doe, Cardiology (Dr. Reed)
+  { id: 'q-1', patientId: 'pat-1', doctorId: 'doc-1', tokenNumber: 'C-001', status: 'WAITING', estimatedWaitTime: 0, createdAt: new Date(Date.now() - 27 * 60 * 1000).toISOString() },
+  // E-001 for Jane Smith, ENT (Dr. Hopper)
+  { id: 'q-2', patientId: 'pat-2', doctorId: 'doc-4', tokenNumber: 'E-001', status: 'WAITING', estimatedWaitTime: 15, createdAt: new Date(Date.now() - 24 * 60 * 1000).toISOString() },
+  // P-001 for Robert Brown, Pediatrics (Dr. Turing)
+  { id: 'q-3', patientId: 'pat-4', doctorId: 'doc-3', tokenNumber: 'P-001', status: 'WAITING', estimatedWaitTime: 25, createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString() },
+  // C-002 for Alice Johnson, Cardiology (Dr. Reed)
+  { id: 'q-4', patientId: 'pat-5', doctorId: 'doc-1', tokenNumber: 'C-002', status: 'WAITING', estimatedWaitTime: 0, createdAt: new Date(Date.now() - 17 * 60 * 1000).toISOString() },
+  // Some other appointments for context
+  { id: 'q-5', patientId: 'pat-3', doctorId: 'doc-2', tokenNumber: 'N-001', status: 'COMPLETED', estimatedWaitTime: 0, createdAt: new Date('2025-10-22T22:04:00Z').toISOString() },
 ];
+
 
 export const caseStudies: CaseStudy[] = [
   {
