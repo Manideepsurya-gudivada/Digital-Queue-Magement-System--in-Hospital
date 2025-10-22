@@ -6,7 +6,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useUser } from "@/firebase";
 import { users } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PatientRegistration } from '@/components/receptionist/patient-registration';
+import { PatientRegistration } from '@/components/shared/patient-registration';
 import { ReceptionQueueTable } from '@/components/receptionist/reception-queue-table';
 import { QueueItem } from '@/lib/data';
 

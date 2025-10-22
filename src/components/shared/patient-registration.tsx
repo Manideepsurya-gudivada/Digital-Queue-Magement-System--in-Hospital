@@ -9,13 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { doctors, patients, queues } from '@/lib/data';
-import type { Patient, QueueItem } from '@/lib/data';
+import type { Patient, QueueItem, User } from '@/lib/data';
 
 interface PatientRegistrationProps {
-  onPatientRegistered: (newQueueItem: QueueItem) => void;
+  onPatientRegistered: (newQueueItem: QueueItem | User) => void;
+  formType?: 'card' | 'dialog';
 }
 
-export function PatientRegistration({ onPatientRegistered }: PatientRegistrationProps) {
+export function PatientRegistration({ onPatientRegistered, formType = 'card' }: PatientRegistrationProps) {
   const [patientName, setPatientName] = useState('');
   const [patientAge, setPatientAge] = useState('');
   const [patientGender, setPatientGender] = useState('');
@@ -76,6 +77,58 @@ export function PatientRegistration({ onPatientRegistered }: PatientRegistration
     setDoctorId('');
   };
 
+  const formContent = (
+    <>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="patient-name">Patient Name</Label>
+          <Input id="patient-name" value={patientName} onChange={(e) => setPatientName(e.target.value)} placeholder="e.g., John Doe" />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="patient-age">Age</Label>
+            <Input id="patient-age" type="number" value={patientAge} onChange={(e) => setPatientAge(e.target.value)} placeholder="e.g., 35" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="patient-gender">Gender</Label>
+            <Select value={patientGender} onValueChange={setPatientGender}>
+              <SelectTrigger id="patient-gender">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="doctor">Assign to Doctor</Label>
+          <Select value={doctorId} onValueChange={setDoctorId}>
+            <SelectTrigger id="doctor">
+              <SelectValue placeholder="Select a doctor..." />
+            </SelectTrigger>
+            <SelectContent>
+              {doctors.map(doc => (
+                <SelectItem key={doc.id} value={doc.id}>{doc.name} - {doc.specialization}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </>
+  );
+
+  if (formType === 'dialog') {
+    return (
+      <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+        {formContent}
+        <Button type="submit" className="w-full mt-4">Register and Generate Token</Button>
+      </form>
+    );
+  }
+
   return (
     <Card>
       <form onSubmit={handleSubmit}>
@@ -83,43 +136,8 @@ export function PatientRegistration({ onPatientRegistered }: PatientRegistration
           <CardTitle>New Patient Registration</CardTitle>
           <CardDescription>Register a new patient and add them to a queue.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="patient-name">Patient Name</Label>
-            <Input id="patient-name" value={patientName} onChange={(e) => setPatientName(e.target.value)} placeholder="e.g., John Doe" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="patient-age">Age</Label>
-              <Input id="patient-age" type="number" value={patientAge} onChange={(e) => setPatientAge(e.target.value)} placeholder="e.g., 35" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="patient-gender">Gender</Label>
-              <Select value={patientGender} onValueChange={setPatientGender}>
-                <SelectTrigger id="patient-gender">
-                  <SelectValue placeholder="Select..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="doctor">Assign to Doctor</Label>
-            <Select value={doctorId} onValueChange={setDoctorId}>
-              <SelectTrigger id="doctor">
-                <SelectValue placeholder="Select a doctor..." />
-              </SelectTrigger>
-              <SelectContent>
-                {doctors.map(doc => (
-                  <SelectItem key={doc.id} value={doc.id}>{doc.name} - {doc.specialization}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <CardContent>
+          {formContent}
         </CardContent>
         <CardFooter>
           <Button type="submit" className="w-full">Register and Generate Token</Button>

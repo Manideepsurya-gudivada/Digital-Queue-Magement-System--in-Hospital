@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Play, CheckCircle, Clock } from "lucide-react";
+import { Play, CheckCircle, Clock, PlusCircle } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,14 +14,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useUser } from "@/firebase";
-import { users, queues, getPatientById, getDoctorById, QueueItem } from "@/lib/data";
+import { users, queues as initialQueues, getPatientById, getDoctorById, QueueItem } from "@/lib/data";
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { PatientRegistration } from '@/components/shared/patient-registration';
 
 export default function AppointmentsPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const [queues, setQueues] = useState<QueueItem[]>(initialQueues);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -46,6 +51,11 @@ export default function AppointmentsPage() {
       </DashboardLayout>
     );
   }
+  
+  const handlePatientRegistered = (newQueueItem: QueueItem) => {
+    setQueues(prevQueues => [...prevQueues, newQueueItem]);
+    setIsDialogOpen(false);
+  };
 
   const getStatusBadge = (status: QueueItem['status']) => {
     switch (status) {
@@ -63,11 +73,17 @@ export default function AppointmentsPage() {
   return (
     <DashboardLayout user={adminUser} pageTitle="All Appointments">
       <Card>
-        <CardHeader>
-          <CardTitle>Appointment Records</CardTitle>
-          <CardDescription>
-            A complete log of all patient appointments.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Appointment Records</CardTitle>
+            <CardDescription>
+              A complete log of all patient appointments.
+            </CardDescription>
+          </div>
+           <Button onClick={() => setIsDialogOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Appointment
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -100,6 +116,17 @@ export default function AppointmentsPage() {
           </Table>
         </CardContent>
       </Card>
+       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Register New Patient Appointment</DialogTitle>
+            <DialogDescription>
+              Fill out the form below to add a new patient to a doctor's queue.
+            </DialogDescription>
+          </DialogHeader>
+          <PatientRegistration onPatientRegistered={handlePatientRegistered} />
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
