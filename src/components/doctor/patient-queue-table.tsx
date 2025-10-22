@@ -19,20 +19,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { queues as initialQueues, getPatientById } from "@/lib/data";
+import { getPatientById } from "@/lib/data";
 import type { QueueItem } from "@/lib/data";
 import { AddCaseStudySheet } from "./add-case-study-sheet";
 import { useToast } from "@/hooks/use-toast";
 import { sendSmsNotification } from "@/ai/flows/send-sms-notification";
+import { formatDistanceToNow } from 'date-fns';
 
 interface PatientQueueTableProps {
   doctorId: string;
+  queues: QueueItem[];
+  setQueues: React.Dispatch<React.SetStateAction<QueueItem[]>>;
 }
 
-export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
-  const [queues, setQueues] = useState<QueueItem[]>(
-    initialQueues.filter(q => q.doctorId === doctorId)
-  );
+export function PatientQueueTable({ doctorId, queues, setQueues }: PatientQueueTableProps) {
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -43,12 +43,7 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
     );
 
     if (status === 'IN_PROGRESS') {
-      // Find the current and next patient
-      const sortedQueues = [...queues].sort((a,b) => {
-        const aNum = parseInt(a.tokenNumber.split('-')[1]);
-        const bNum = parseInt(b.tokenNumber.split('-')[1]);
-        return aNum - bNum;
-      });
+      const sortedQueues = [...queues].sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
       const currentIndex = sortedQueues.findIndex(q => q.id === queueId);
       const nextPatientInQueue = sortedQueues.find((q, index) => index > currentIndex && q.status === 'WAITING');
 
@@ -76,6 +71,21 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
       }
     }
   };
+
+  const handleCallNext = () => {
+    const waitingPatients = queues
+      .filter(q => q.status === 'WAITING')
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    
+    if(waitingPatients.length > 0) {
+        handleStatusChange(waitingPatients[0].id, 'IN_PROGRESS');
+    } else {
+        toast({
+            title: "No patients waiting",
+            description: "There are no patients currently in the queue.",
+        });
+    }
+  };
   
   const handleAddCaseStudy = (patientId: string) => {
     setSelectedPatientId(patientId);
@@ -85,11 +95,11 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
   const getStatusBadge = (status: QueueItem['status']) => {
     switch (status) {
       case "WAITING":
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><Clock className="mr-1 h-3 w-3" />Waiting</Badge>;
+        return <Badge variant="secondary">Waiting</Badge>;
       case "IN_PROGRESS":
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800"><Play className="mr-1 h-3 w-3" />In Progress</Badge>;
+        return <Badge variant="default">In Progress</Badge>;
       case "COMPLETED":
-        return <Badge variant="secondary" className="bg-green-100 text-green-800"><CheckCircle className="mr-1 h-3 w-3" />Completed</Badge>;
+        return <Badge variant="outline">Completed</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -97,13 +107,16 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
 
   return (
     <>
+      <div className="flex justify-end mb-4">
+        <Button onClick={handleCallNext}>Call Next</Button>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Token</TableHead>
+            <TableHead>Ticket #</TableHead>
             <TableHead>Patient</TableHead>
-            <TableHead>Wait Time</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Waiting Since</TableHead>
             <TableHead>
               <span className="sr-only">Actions</span>
             </TableHead>
@@ -111,19 +124,15 @@ export function PatientQueueTable({ doctorId }: PatientQueueTableProps) {
         </TableHeader>
         <TableBody>
           {queues
-            .sort((a,b) => {
-                const aNum = parseInt(a.tokenNumber.split('-')[1]);
-                const bNum = parseInt(b.tokenNumber.split('-')[1]);
-                return aNum - bNum;
-            })
+            .sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
             .map((item) => {
             const patient = getPatientById(item.patientId);
             return (
-              <TableRow key={item.id} className={item.status === 'IN_PROGRESS' ? 'bg-blue-50' : ''}>
-                <TableCell className="font-medium">#{item.tokenNumber}</TableCell>
+              <TableRow key={item.id} className={item.status === 'IN_PROGRESS' ? 'bg-blue-50 dark:bg-blue-900/50' : ''}>
+                <TableCell className="font-medium">{item.tokenNumber}</TableCell>
                 <TableCell>{patient?.name || "Unknown"}</TableCell>
-                <TableCell>{item.status === 'WAITING' ? `${item.estimatedWaitTime} min` : '-'}</TableCell>
                 <TableCell>{getStatusBadge(item.status)}</TableCell>
+                <TableCell>{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
