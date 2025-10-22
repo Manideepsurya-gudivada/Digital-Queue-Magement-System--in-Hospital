@@ -66,17 +66,10 @@ export default function AuthenticationPage() {
                 </Tabs>
               </TabsContent>
               <TabsContent value="staff" className="pt-4">
-                <Tabs defaultValue="login" className="w-full">
-                  <TabsList className="grid w-full grid-cols-1">
-                    <TabsTrigger value="login">Login</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="login" className="pt-4">
-                    <LoginForm role="DOCTOR" />
-                    <p className="px-8 text-center text-sm text-muted-foreground mt-4">
-                      Demo Login: `admin@mediqueue.pro` or `evelyn.reed@mediqueue.pro`
-                    </p>
-                  </TabsContent>
-                </Tabs>
+                <LoginForm role="DOCTOR" />
+                <p className="px-8 text-center text-sm text-muted-foreground mt-4">
+                  Demo Login: `admin@mediqueue.pro` or `evelyn.reed@mediqueue.pro`
+                </p>
               </TabsContent>
             </Tabs>
           </CardContent>
