@@ -50,8 +50,8 @@ export function LoginForm() {
       await signInWithEmailAndPassword(auth, email, loginPassword);
       // Redirect is handled by useEffect
     } catch (error: any) {
-        // If it's a demo user and login fails, try creating the account
-        if (isDemoUser && (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential')) {
+        // If it's a demo user and login fails because the user doesn't exist, try creating the account
+        if (isDemoUser && error.code === 'auth/user-not-found') {
             try {
                 await createUserWithEmailAndPassword(auth, email, loginPassword);
                 // After creation, login is handled automatically by onAuthStateChanged
