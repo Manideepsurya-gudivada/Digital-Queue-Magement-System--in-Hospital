@@ -14,7 +14,9 @@ import { Logo } from '@/components/icons';
 import { Settings, LogOut } from 'lucide-react';
 import type { User, UserRole } from '@/lib/data';
 import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/firebase';
+import { signOut, Auth } from 'firebase/auth';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -24,6 +26,17 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, user, pageTitle }: DashboardLayoutProps) {
   const initials = user.name.split(' ').map(n => n[0]).join('');
+  const auth = useAuth() as Auth;
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -38,12 +51,10 @@ export function DashboardLayout({ children, user, pageTitle }: DashboardLayoutPr
           <SidebarNav role={user.role} />
         </SidebarContent>
         <SidebarFooter className="p-4">
-           <Link href="/">
-            <Button variant="ghost" className="w-full justify-start gap-2">
+            <Button onClick={handleLogout} variant="ghost" className="w-full justify-start gap-2">
               <LogOut size={16} />
               <span className="group-data-[collapsible=icon]:hidden">Logout</span>
             </Button>
-          </Link>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

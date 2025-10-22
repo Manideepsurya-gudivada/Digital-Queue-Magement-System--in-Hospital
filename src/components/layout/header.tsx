@@ -19,6 +19,10 @@ import { Bell, LayoutGrid, LogOut, Settings, User } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { User as UserType } from "@/lib/data";
 import { notifications } from "@/lib/data";
+import { useAuth } from "@/firebase";
+import { signOut, Auth } from 'firebase/auth';
+import { useRouter } from "next/navigation";
+
 
 interface HeaderProps {
   user: UserType;
@@ -27,6 +31,18 @@ interface HeaderProps {
 
 export function Header({ user, pageTitle }: HeaderProps) {
   const initials = user.name.split(' ').map(n => n[0]).join('');
+  const auth = useAuth() as Auth;
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
+
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
@@ -111,12 +127,10 @@ export function Header({ user, pageTitle }: HeaderProps) {
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <Link href="/">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
-            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
