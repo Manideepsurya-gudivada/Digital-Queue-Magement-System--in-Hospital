@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Bell, LayoutGrid, LogOut, Settings, User } from "lucide-react";
+import { Bell, Bot, LayoutGrid, LogOut, Settings, User } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { User as UserType } from "@/lib/data";
 import { notifications } from "@/lib/data";
@@ -121,8 +121,8 @@ export function Header({ user, pageTitle }: HeaderProps) {
               </Link>
               <Link href="/predict">
                 <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Tools</span>
+                  <Bot className="mr-2 h-4 w-4" />
+                  <span>AI Tools</span>
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>
