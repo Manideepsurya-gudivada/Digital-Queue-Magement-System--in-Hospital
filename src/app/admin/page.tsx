@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users as UsersIcon, CalendarCheck, Stethoscope } from 'lucide-react';
 import { WeeklyAppointmentsChart } from '@/components/admin/weekly-appointments-chart';
-import { RecentAppointmentsTable } from '@/components/admin/recent-appointments-table';
+import { QueueOverview } from '@/components/admin/queue-overview';
 
 const stats = [
   {
@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
                     <WeeklyAppointmentsChart />
                 </div>
                 <div className="lg:col-span-2">
-                    <RecentAppointmentsTable />
+                    <QueueOverview />
                 </div>
             </div>
         </div>
