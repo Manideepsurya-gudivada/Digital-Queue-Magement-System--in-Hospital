@@ -38,26 +38,44 @@ export function PatientQueueTable({ doctorId, queues, setQueues }: PatientQueueT
   const { toast } = useToast();
 
   const handleStatusChange = async (queueId: string, status: 'IN_PROGRESS' | 'COMPLETED') => {
+    const queueItem = queues.find(q => q.id === queueId);
+    if (!queueItem) return;
+
     setQueues(prevQueues =>
       prevQueues.map(q => (q.id === queueId ? { ...q, status } : q))
     );
 
-    if (status === 'IN_PROGRESS') {
+    const patientDetails = getPatientById(queueItem.patientId);
+
+    if (status === 'IN_PROGRESS' && patientDetails && patientDetails.phone !== 'N/A') {
+        try {
+            await sendSmsNotification({
+                to: patientDetails.phone,
+                message: `Hi ${patientDetails.name}, your consultation with the doctor is starting now.`
+            });
+            toast({
+                title: "SMS Sent to Current Patient",
+                description: `Notified ${patientDetails.name} that their consultation is starting.`,
+            });
+        } catch (error) {
+            console.error("Failed to send SMS to current patient:", error);
+        }
+        
       const sortedQueues = [...queues].sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
       const currentIndex = sortedQueues.findIndex(q => q.id === queueId);
       const nextPatientInQueue = sortedQueues.find((q, index) => index > currentIndex && q.status === 'WAITING');
 
       if (nextPatientInQueue) {
-        const patientDetails = getPatientById(nextPatientInQueue.patientId);
-        if (patientDetails && patientDetails.phone !== 'N/A') {
+        const nextPatientDetails = getPatientById(nextPatientInQueue.patientId);
+        if (nextPatientDetails && nextPatientDetails.phone !== 'N/A') {
           try {
             await sendSmsNotification({
-              to: patientDetails.phone,
-              message: `Hi ${patientDetails.name}, you are next in the queue to see the doctor. Please be ready.`
+              to: nextPatientDetails.phone,
+              message: `Hi ${nextPatientDetails.name}, you are next in the queue to see the doctor. Please be ready.`
             });
             toast({
-              title: "Notification Sent",
-              description: `An SMS has been sent to ${patientDetails.name} to inform them they are next.`,
+              title: "SMS Sent to Next Patient",
+              description: `Notified ${nextPatientDetails.name} that they are next in line.`,
             });
           } catch (error) {
             console.error("Failed to send SMS:", error);
