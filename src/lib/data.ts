@@ -96,10 +96,10 @@ export const patients: Patient[] = [
 ];
 
 export const queues: QueueItem[] = [
-  { id: 'q-1', patientId: 'pat-1', doctorId: 'doc-1', tokenNumber: 101, status: 'IN_PROGRESS', estimatedWaitTime: 0, createdAt: new Date(Date.now() - 10 * 60000).toISOString() },
-  { id: 'q-2', patientId: 'pat-2', doctorId: 'doc-1', tokenNumber: 102, status: 'WAITING', estimatedWaitTime: 15, createdAt: new Date(Date.now() - 5 * 60000).toISOString() },
-  { id: 'q-3', patientId: 'pat-3', doctorId: 'doc-1', tokenNumber: 103, status: 'WAITING', estimatedWaitTime: 25, createdAt: new Date(Date.now() - 2 * 60000).toISOString() },
-  { id: 'q-4', patientId: 'pat-4', doctorId: 'doc-2', tokenNumber: 201, status: 'COMPLETED', estimatedWaitTime: 0, createdAt: new Date(Date.now() - 60 * 60000).toISOString() },
+  { id: 'q-1', patientId: 'pat-1', doctorId: 'doc-1', tokenNumber: 101, status: 'IN_PROGRESS', estimatedWaitTime: 0, createdAt: new Date('2025-10-22T22:54:00Z').toISOString() },
+  { id: 'q-2', patientId: 'pat-2', doctorId: 'doc-1', tokenNumber: 102, status: 'WAITING', estimatedWaitTime: 15, createdAt: new Date('2025-10-22T22:59:00Z').toISOString() },
+  { id: 'q-3', patientId: 'pat-3', doctorId: 'doc-1', tokenNumber: 103, status: 'WAITING', estimatedWaitTime: 25, createdAt: new Date('2025-10-22T23:02:00Z').toISOString() },
+  { id: 'q-4', patientId: 'pat-4', doctorId: 'doc-2', tokenNumber: 201, status: 'COMPLETED', estimatedWaitTime: 0, createdAt: new Date('2025-10-22T22:04:00Z').toISOString() },
 ];
 
 export const caseStudies: CaseStudy[] = [
