@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, Play, CheckCircle, Clock } from "lucide-react";
+import { Play, CheckCircle, Clock } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -38,10 +38,12 @@ export default function AppointmentsPage() {
 
   if (isUserLoading || !user || !adminUser) {
     return (
-      <div className="p-8">
-        <Skeleton className="h-16 w-1/2 mb-8" />
-        <Skeleton className="h-[400px] w-full" />
-      </div>
+      <DashboardLayout user={users.find(u => u.role === 'ADMIN')!} pageTitle="All Appointments">
+        <div className="p-8">
+          <Skeleton className="h-16 w-1/2 mb-8" />
+          <Skeleton className="h-[400px] w-full" />
+        </div>
+      </DashboardLayout>
     );
   }
 
