@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { users } from '@/lib/data';
 import type { User, UserRole } from '@/lib/data';
+import { Separator } from '../ui/separator';
 
 interface EditUserFormProps {
   user: User;
@@ -19,6 +20,7 @@ export function EditUserForm({ user, onUserUpdated }: EditUserFormProps) {
   const [email, setEmail] = useState(user.email);
   const [phone, setPhone] = useState(user.phone);
   const [role, setRole] = useState<UserRole>(user.role);
+  const [newPassword, setNewPassword] = useState('');
   
   const { toast } = useToast();
   
@@ -27,6 +29,7 @@ export function EditUserForm({ user, onUserUpdated }: EditUserFormProps) {
     setEmail(user.email);
     setPhone(user.phone);
     setRole(user.role);
+    setNewPassword('');
   }, [user]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,9 +60,17 @@ export function EditUserForm({ user, onUserUpdated }: EditUserFormProps) {
 
     onUserUpdated(updatedUser);
 
+    let toastDescription = `${name}'s details have been successfully updated.`;
+    if (newPassword) {
+      // In a real app, you would use the Firebase Admin SDK on a backend
+      // to change the user's password. This is a client-side simulation.
+      console.log(`Simulating password change for user ${user.id} to: ${newPassword}`);
+      toastDescription = `${name}'s details and password have been updated.`;
+    }
+
     toast({
       title: 'User Updated',
-      description: `${name}'s details have been successfully updated.`,
+      description: toastDescription,
     });
   };
 
@@ -91,6 +102,20 @@ export function EditUserForm({ user, onUserUpdated }: EditUserFormProps) {
             </SelectContent>
           </Select>
         </div>
+      
+      <Separator className="my-4" />
+
+      <div className="space-y-2">
+        <Label htmlFor="new-password">New Password (Optional)</Label>
+        <Input 
+          id="new-password" 
+          type="password" 
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          placeholder="Set a new password"
+        />
+      </div>
+
       <Button type="submit" className="w-full mt-4">Save Changes</Button>
     </form>
   );
