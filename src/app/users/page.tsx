@@ -27,11 +27,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { PatientRegistration } from '@/components/admin/patient-registration';
+import { EditUserForm } from '@/components/admin/edit-user-form';
 
 export default function UsersPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>(initialUsers);
 
   useEffect(() => {
@@ -70,8 +73,18 @@ export default function UsersPage() {
 
   const handlePatientRegistered = (newPatient: User) => {
     setUsers(prevUsers => [...prevUsers, newPatient]);
-    setIsDialogOpen(false);
+    setIsAddDialogOpen(false);
   };
+  
+  const handleUserUpdated = (updatedUser: User) => {
+    setUsers(prevUsers => prevUsers.map(u => u.id === updatedUser.id ? updatedUser : u));
+    setIsEditDialogOpen(false);
+  }
+
+  const handleEditClick = (userToEdit: User) => {
+    setSelectedUser(userToEdit);
+    setIsEditDialogOpen(true);
+  }
 
   return (
     <DashboardLayout user={adminUser} pageTitle="User Management">
@@ -81,7 +94,7 @@ export default function UsersPage() {
             <CardTitle>All Users</CardTitle>
             <CardDescription>A list of all users in the system.</CardDescription>
           </div>
-          <Button onClick={() => setIsDialogOpen(true)}>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Add User
           </Button>
@@ -128,7 +141,7 @@ export default function UsersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit User Details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditClick(u)}>Edit User Details</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">Delete User</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -140,7 +153,7 @@ export default function UsersPage() {
         </CardContent>
       </Card>
       
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Register New Patient</DialogTitle>
@@ -151,6 +164,23 @@ export default function UsersPage() {
           <PatientRegistration onPatientRegistered={handlePatientRegistered} />
         </DialogContent>
       </Dialog>
+      
+      {selectedUser && (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle>Edit User Details</DialogTitle>
+                <DialogDescription>
+                Update the information for {selectedUser.name}.
+                </DialogDescription>
+            </DialogHeader>
+            <EditUserForm 
+                user={selectedUser} 
+                onUserUpdated={handleUserUpdated}
+            />
+            </DialogContent>
+        </Dialog>
+      )}
     </DashboardLayout>
   );
 }
