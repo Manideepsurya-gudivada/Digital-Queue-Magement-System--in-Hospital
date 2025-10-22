@@ -29,6 +29,7 @@ const allNavItems = {
     { href: "/doctors", label: "Doctors", icon: Stethoscope },
     { href: "/departments", label: "Departments", icon: Building },
     { href: "/predict", label: "AI Predictor", icon: BrainCircuit },
+    { href: "/profile", label: "Profile", icon: Settings },
   ],
   DOCTOR: [
     { href: "/doctor", label: "Patient Queue", icon: Users },

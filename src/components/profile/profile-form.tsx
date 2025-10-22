@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { User } from "@/lib/data";
+import { Separator } from "../ui/separator";
+import { KeyRound } from "lucide-react";
 
 interface ProfileFormProps {
     user: User;
@@ -28,7 +30,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <form className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -50,6 +52,32 @@ export function ProfileForm({ user }: ProfileFormProps) {
           </div>
            <Button className="mt-4">Save Changes</Button>
         </form>
+
+        <Separator />
+
+        <div>
+            <div className="flex items-center gap-2 mb-4">
+                <KeyRound className="w-5 h-5 text-muted-foreground" />
+                <h3 className="text-lg font-semibold">Change Password</h3>
+            </div>
+            <form className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input id="current-password" type="password" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="new-password">New Password</Label>
+                        <Input id="new-password" type="password" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="confirm-password">Confirm New Password</Label>
+                        <Input id="confirm-password" type="password" />
+                    </div>
+                </div>
+                <Button variant="secondary">Update Password</Button>
+            </form>
+        </div>
       </CardContent>
     </Card>
   );
