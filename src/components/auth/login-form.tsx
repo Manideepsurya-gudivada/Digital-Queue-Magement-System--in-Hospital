@@ -48,40 +48,44 @@ export function LoginForm() {
     const loginPassword = isDemoUser ? 'password' : password;
 
     try {
-        if (isDemoUser) {
-            // Proactive sign-up/sign-in logic for demo users to avoid `auth/invalid-credential` ambiguity.
-            // Create user will also sign them in. If it fails because they exist, we sign them in.
+        // Proactive sign-up/sign-in logic for ALL users to avoid `auth/invalid-credential` ambiguity.
+        // Create user will also sign them in. If it fails because they exist, we sign them in.
+        await createUserWithEmailAndPassword(auth, email, loginPassword);
+        // User is created and signed in, useEffect will handle redirect.
+    } catch (creationError: any) {
+        if (creationError.code === 'auth/email-already-in-use') {
+            // This is expected if the user already exists. Proceed to sign in.
             try {
-                await createUserWithEmailAndPassword(auth, email, loginPassword);
-                // User is created and signed in, useEffect will handle redirect.
-            } catch (creationError: any) {
-                if (creationError.code === 'auth/email-already-in-use') {
-                    // This is expected if the demo user already exists. Proceed to sign in.
-                    await signInWithEmailAndPassword(auth, email, loginPassword);
+                await signInWithEmailAndPassword(auth, email, loginPassword);
+            } catch (signInError: any) {
+                console.error("Sign-In Error after creation attempt:", signInError);
+                let description = "Invalid email or password. Please try again.";
+                if (signInError.code === 'auth/wrong-password' || signInError.code === 'auth/invalid-credential') {
+                    description = "Invalid email or password. Please try again.";
                 } else {
-                    // Another error occurred during creation.
-                    throw creationError;
+                    description = signInError.message;
                 }
+                toast({
+                    variant: "destructive",
+                    title: "Login Failed",
+                    description: description,
+                });
             }
         } else {
-            // For non-demo users, just attempt to sign in.
-            await signInWithEmailAndPassword(auth, email, loginPassword);
+            // Another error occurred during creation attempt.
+             console.error("Login Error:", creationError);
+            let description = "An unexpected error occurred. Please try again.";
+            if (creationError.code === 'auth/weak-password') {
+                description = "Password must be at least 6 characters long.";
+            } else {
+                description = creationError.message;
+            }
+            toast({
+                variant: "destructive",
+                title: "Login Failed",
+                description: description,
+            });
         }
-    } catch (error: any) {
-        console.error("Login Error:", error);
-        let description = "An unexpected error occurred. Please try again.";
-        if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-            description = "Invalid email or password. Please try again.";
-        } else if (error.code === 'auth/user-not-found') {
-            description = "No account found with this email.";
-        } else {
-            description = error.message;
-        }
-        toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: description,
-        });
     } finally {
         setIsLoading(false);
     }
