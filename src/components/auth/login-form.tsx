@@ -4,10 +4,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { User, Lock, Loader2 } from 'lucide-react';
@@ -22,7 +21,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const demoUsers = ['admin@mediqueue.pro'];
+  const demoUsers = ['admin@mediqueue.pro', 'evelyn.reed@mediqueue.pro', 'reception@mediqueue.pro'];
   const isDemoUser = demoUsers.includes(email);
 
   useEffect(() => {
@@ -31,6 +30,10 @@ export function LoginForm() {
         const loggedInUser = users.find(u => u.email === user.email);
         if (loggedInUser?.role === 'ADMIN') {
             router.push('/admin');
+        } else if (loggedInUser?.role === 'DOCTOR') {
+            router.push('/doctor');
+        } else if (loggedInUser?.role === 'RECEPTIONIST') {
+            router.push('/receptionist');
         } else {
             // Fallback for other roles if they exist
             router.push('/dashboard');
@@ -41,25 +44,38 @@ export function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // For demo purposes, we will use a fixed password for the admin user
     const loginPassword = isDemoUser ? 'password' : password;
 
     try {
       await signInWithEmailAndPassword(auth, email, loginPassword);
       // Redirect is handled by useEffect
     } catch (error: any) {
-      console.error("Login Error:", error);
-      let description = "An unexpected error occurred. Please try again.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        description = "Invalid email or password. Please try again.";
-      } else {
-        description = error.message;
-      }
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: description,
-      });
+        // If it's a demo user and login fails, try creating the account
+        if (isDemoUser && (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential')) {
+            try {
+                await createUserWithEmailAndPassword(auth, email, loginPassword);
+                // After creation, login is handled automatically by onAuthStateChanged
+            } catch (creationError: any) {
+                 toast({
+                    variant: "destructive",
+                    title: "Demo Account Creation Failed",
+                    description: creationError.message,
+                });
+            }
+        } else {
+            console.error("Login Error:", error);
+            let description = "An unexpected error occurred. Please try again.";
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                description = "Invalid email or password. Please try again.";
+            } else {
+                description = error.message;
+            }
+            toast({
+                variant: "destructive",
+                title: "Login Failed",
+                description: description,
+            });
+        }
     } finally {
         setIsLoading(false);
     }
