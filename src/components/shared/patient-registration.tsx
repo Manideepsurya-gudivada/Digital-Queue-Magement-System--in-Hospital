@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { doctors, patients, queues } from '@/lib/data';
 import type { Patient, QueueItem, User } from '@/lib/data';
+import { sendSmsNotification } from '@/ai/flows/send-sms-notification';
 
 interface PatientRegistrationProps {
   onPatientRegistered: (newQueueItem: QueueItem | User) => void;
@@ -24,7 +25,7 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
   const [doctorId, setDoctorId] = useState('');
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!patientName || !patientAge || !patientGender || !doctorId) {
       toast({
@@ -80,6 +81,27 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
       title: 'Patient Registered',
       description: `${patientName} has been assigned token #${newTokenNumber} for Dr. ${doctor.name}.`,
     });
+    
+    if (newPatient.phone && newPatient.phone !== 'N/A') {
+        try {
+            await sendSmsNotification({
+                to: newPatient.phone,
+                message: `Hi ${newPatient.name}, your appointment is confirmed. Your token is ${newTokenNumber} for Dr. ${doctor.name}.`
+            });
+            toast({
+                title: "Confirmation SMS Sent",
+                description: `Sent booking details to ${newPatient.name}.`,
+            });
+        } catch (error) {
+            console.error("Failed to send booking SMS:", error);
+            toast({
+                variant: 'destructive',
+                title: 'SMS Failed',
+                description: 'Could not send confirmation SMS.'
+            })
+        }
+    }
+
 
     // Reset form
     setPatientName('');
@@ -116,7 +138,7 @@ export function PatientRegistration({ onPatientRegistered, formType = 'card' }: 
           </div>
         </div>
         <div className="space-y-2">
-            <Label htmlFor="patient-phone">Phone Number (Optional)</Label>
+            <Label htmlFor="patient-phone">Phone Number (For SMS Alerts)</Label>
             <Input id="patient-phone" type="tel" value={patientPhone} onChange={(e) => setPatientPhone(e.target.value)} placeholder="e.g., 123-456-7890" />
         </div>
         <div className="space-y-2">
