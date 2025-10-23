@@ -5,13 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ChartTooltipContent, ChartTooltip, ChartContainer } from '@/components/ui/chart';
 
 const chartData = [
-  { day: "Mon", appointments: 0 },
-  { day: "Tue", appointments: 0 },
-  { day: "Wed", appointments: 0 },
-  { day: "Thu", appointments: 0 },
-  { day: "Fri", appointments: 0 },
-  { day: "Sat", appointments: 0 },
-  { day: "Sun", appointments: 0 },
+  { day: "Mon", appointments: 5 },
+  { day: "Tue", appointments: 8 },
+  { day: "Wed", appointments: 12 },
+  { day: "Thu", appointments: 7 },
+  { day: "Fri", appointments: 15 },
+  { day: "Sat", appointments: 3 },
+  { day: "Sun", appointments: 1 },
 ];
 
 const chartConfig = {

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useUser } from "@/firebase";
-import { users } from "@/lib/data";
+import { users, queues, doctors } from "@/lib/data";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users as UsersIcon, CalendarCheck, Stethoscope } from 'lucide-react';
@@ -14,17 +14,17 @@ import { QueueOverview } from '@/components/admin/queue-overview';
 const stats = [
   {
     title: 'Total Users',
-    value: '0',
+    value: users.length.toString(),
     icon: <UsersIcon className="h-8 w-8 text-purple-600" />,
   },
   {
     title: 'Appointments',
-    value: '0',
+    value: queues.length.toString(),
     icon: <CalendarCheck className="h-8 w-8 text-green-500" />,
   },
   {
     title: 'Doctors',
-    value: '0',
+    value: doctors.length.toString(),
     icon: <Stethoscope className="h-8 w-8 text-yellow-500" />,
   },
 ];
