@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { QueueStatus } from "@/components/dashboard/queue-status";
 import { Notifications } from "@/components/dashboard/notifications";
+import { PreviousRecords } from '@/components/dashboard/previous-records';
 import { useUser } from "@/firebase";
 import { users } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,12 +28,13 @@ export default function PatientDashboardPage() {
     return (
       <div className="p-8">
         <Skeleton className="h-16 w-1/2 mb-8" />
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-          <div className="w-full lg:w-1/2 flex-grow">
-            <Skeleton className="h-96 w-full" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1 space-y-8">
+             <Skeleton className="h-96 w-full" />
+             <Skeleton className="h-64 w-full" />
           </div>
-          <div className="w-full lg:w-1/2 flex-grow">
-            <Skeleton className="h-64 w-full" />
+          <div className="lg:col-span-2">
+             <Skeleton className="h-[500px] w-full" />
           </div>
         </div>
       </div>
@@ -41,12 +43,13 @@ export default function PatientDashboardPage() {
 
   return (
     <DashboardLayout user={patientUser} pageTitle="My Dashboard">
-      <div className="flex flex-col lg:flex-row gap-8 items-start">
-        <div className="w-full lg:w-1/2 flex-grow">
-          <QueueStatus />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="lg:col-span-1 space-y-8">
+            <QueueStatus />
+            <Notifications />
         </div>
-        <div className="w-full lg:w-1/2 flex-grow">
-          <Notifications />
+        <div className="lg:col-span-2">
+            <PreviousRecords patientId={patientUser.id} />
         </div>
       </div>
     </DashboardLayout>
