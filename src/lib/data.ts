@@ -16,6 +16,7 @@ export interface User {
 
 export interface Patient extends User {
   role: 'PATIENT';
+  userId?: string; // Link to the UserProfile ID
   age: number;
   gender: 'Male' | 'Female' | 'Other';
   medicalHistory: string;
@@ -168,8 +169,8 @@ export const recentActivities: Activity[] = [
     { id: 'act-4', description: 'A new case study on "Atypical Myocardial Infarction" was published.', timestamp: '45m ago' },
 ];
 
-export function getPatientById(id: string) {
-  return patients.find(p => p.id === id);
+export function getPatientById(id: string): Patient | undefined {
+  return patients.find(p => p.id === id) as Patient | undefined;
 }
 
 export function getDoctorById(id: string) {

@@ -1,15 +1,14 @@
 {
   "entities": {
-    "User": {
+    "UserProfile": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "User",
+      "title": "UserProfile",
       "type": "object",
-      "description": "Represents a user of the system (Admin, Doctor, or Patient).",
+      "description": "Represents a user of the system (Admin, Doctor, Patient, etc.).",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the user.",
-          "format": "uuid"
+          "description": "Unique identifier for the user (matches Firebase Auth UID)."
         },
         "name": {
           "type": "string",
@@ -22,7 +21,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The user's role in the system (ADMIN, DOCTOR, PATIENT)."
+          "description": "The user's role in the system (ADMIN, DOCTOR, PATIENT, RECEPTIONIST)."
         },
         "phone": {
           "type": "string",
@@ -33,24 +32,22 @@
         "id",
         "name",
         "email",
-        "role",
-        "phone"
+        "role"
       ]
     },
     "Patient": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Patient",
       "type": "object",
-      "description": "Represents a patient in the system.",
+      "description": "Represents patient-specific data, linked to a UserProfile.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the patient.",
-          "format": "uuid"
+          "description": "Unique identifier for the patient record."
         },
         "userId": {
           "type": "string",
-          "description": "Reference to User. (Relationship: User 1:1 Patient)"
+          "description": "Reference to the UserProfile. (Relationship: UserProfile 1:1 Patient)"
         },
         "age": {
           "type": "number",
@@ -62,31 +59,29 @@
         },
         "medicalHistory": {
           "type": "string",
-          "description": "The patient's medical history."
+          "description": "A summary of the patient's medical history."
         }
       },
       "required": [
         "id",
         "userId",
         "age",
-        "gender",
-        "medicalHistory"
+        "gender"
       ]
     },
     "Doctor": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Doctor",
       "type": "object",
-      "description": "Represents a doctor in the system.",
+      "description": "Represents doctor-specific data, linked to a UserProfile.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the doctor.",
-          "format": "uuid"
+          "description": "Unique identifier for the doctor record."
         },
         "userId": {
           "type": "string",
-          "description": "Reference to User. (Relationship: User 1:1 Doctor)"
+          "description": "Reference to the UserProfile. (Relationship: UserProfile 1:1 Doctor)"
         },
         "specialization": {
           "type": "string",
@@ -211,7 +206,7 @@
         },
         "userId": {
           "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Notification)"
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N Notification)"
         },
         "message": {
           "type": "string",
@@ -247,11 +242,11 @@
       {
         "path": "/users/{userId}",
         "definition": {
-          "entityName": "User",
+          "entityName": "UserProfile",
           "schema": {
-            "$ref": "#/backend/entities/User"
+            "$ref": "#/backend/entities/UserProfile"
           },
-          "description": "Stores user profiles.  The 'userId' parameter is the Firebase Authentication UID. No denormalized authorization fields are needed as access is based on the UID.",
+          "description": "Stores user profiles. The 'userId' parameter is the Firebase Authentication UID.",
           "params": [
             {
               "name": "userId",
@@ -267,7 +262,7 @@
           "schema": {
             "$ref": "#/backend/entities/Patient"
           },
-          "description": "Stores patient profiles associated with a user.  The 'userId' parameter is the Firebase Authentication UID, which links to the user profile. Includes denormalized 'userId' for authorization independence.",
+          "description": "Stores patient-specific data, linked to a user profile. The 'userId' parameter ensures that only the owning user can access their patient data.",
           "params": [
             {
               "name": "userId",
@@ -275,7 +270,7 @@
             },
             {
               "name": "patientId",
-              "description": "The unique identifier for the patient."
+              "description": "The unique identifier for the patient record."
             }
           ]
         }
@@ -287,7 +282,7 @@
           "schema": {
             "$ref": "#/backend/entities/Doctor"
           },
-          "description": "Stores doctor profiles associated with a user.  The 'userId' parameter is the Firebase Authentication UID, which links to the user profile. Includes denormalized 'userId' for authorization independence.",
+          "description": "Stores doctor-specific data, linked to a user profile. The 'userId' parameter ensures that only the owning user can access their doctor data.",
           "params": [
             {
               "name": "userId",
@@ -295,7 +290,7 @@
             },
             {
               "name": "doctorId",
-              "description": "The unique identifier for the doctor."
+              "description": "The unique identifier for the doctor record."
             }
           ]
         }
@@ -307,7 +302,7 @@
           "schema": {
             "$ref": "#/backend/entities/Queue"
           },
-          "description": "Stores queue entries. Includes denormalized 'doctorId' and 'patientId' for authorization independence, allowing rules to check doctor and patient relationships directly.",
+          "description": "Stores queue entries. Access can be controlled based on the roles of the users involved (e.g., the assigned doctor or an admin).",
           "params": [
             {
               "name": "queueId",
@@ -323,7 +318,7 @@
           "schema": {
             "$ref": "#/backend/entities/CaseStudy"
           },
-          "description": "Stores case studies documented by doctors. Includes denormalized 'doctorId' for authorization independence, enabling rules to verify the doctor's ownership of the case study.",
+          "description": "Stores case studies. Includes denormalized 'doctorId' for rules to verify ownership.",
           "params": [
             {
               "name": "caseStudyId",
@@ -339,7 +334,7 @@
           "schema": {
             "$ref": "#/backend/entities/Notification"
           },
-          "description": "Stores notifications for users. The 'userId' parameter ensures that notifications are scoped to the user's ID, providing straightforward ownership-based security. Includes denormalized 'userId' for authorization independence.",
+          "description": "Stores notifications for users. The 'userId' ensures notifications are scoped to a specific user.",
           "params": [
             {
               "name": "userId",
@@ -353,6 +348,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the features of the MediQueue Pro application, prioritizing security, scalability, and debuggability as outlined in the design principles. It incorporates denormalization for authorization independence, structural segregation for homogeneous security postures, and standardized access modeling. This design avoids hierarchical authorization dependencies, ensuring atomic operations and simplified debugging. The design facilitates secure list operations (QAPs) through structural segregation and membership models.\n\n*   **Authorization Independence:** Achieved by denormalizing authorization data. For example, patient details necessary for queue operations are directly associated with the queue document, avoiding the need to fetch patient data during queue management. Similarly, Doctor details required for CaseStudy management is also present within the CaseStudy document.\n*   **Structural Segregation:** Different data types with different access requirements are stored in separate collections (e.g., `users`, `patients`, `doctors`, `queues`, `case_studies`, `notifications`).\n*   **Access Modeling:** User-owned data (`patients`, `doctors`, `notifications`) are stored under the `/users/{userId}` path. Collaborative data (if any) would use a membership map (`members: {uid1: 'role', uid2: 'role'}`). Global roles are managed via existence checks in dedicated collections like `/roles_admin/{uid}`.\n*   **QAPs (Rules are not Filters):**  Structural segregation ensures that list operations can be secured based on the collection being accessed. For instance, listing case studies will only return case studies that the user has permission to view.\n*   **Invariants:** The structure supports the integrity of ownership, timestamps, and denormalized data, for example, all records are linked to the user via userId field.\n\n"
+    "reasoning": "The Firestore data structure has been updated to introduce a `UserProfile` entity. This separates core user information (like name, email, role) from role-specific data (like a patient's age or a doctor's specialization). This is a more scalable and normalized approach. The `Patient` and `Doctor` entities are now sub-collections under the main `/users/{userId}` document, ensuring a clear ownership model. This structure simplifies security rules, as access to a user's own patient or doctor data is inherently controlled by the `userId` in the document path."
   }
 }

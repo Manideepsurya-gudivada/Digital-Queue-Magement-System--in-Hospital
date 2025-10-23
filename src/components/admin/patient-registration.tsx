@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { users, patients } from '@/lib/data';
 import type { Patient, User } from '@/lib/data';
+import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { useAuth, useFirestore } from '@/firebase';
 
 interface PatientRegistrationProps {
   onPatientRegistered: (newPatient: User) => void;
@@ -22,8 +24,10 @@ export function PatientRegistration({ onPatientRegistered }: PatientRegistration
   const [patientEmail, setPatientEmail] = useState('');
   
   const { toast } = useToast();
+  const auth = useAuth() as Auth;
+  const firestore = useFirestore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!patientName || !patientAge || !patientGender || !patientEmail) {
       toast({
@@ -34,36 +38,58 @@ export function PatientRegistration({ onPatientRegistered }: PatientRegistration
       return;
     }
 
-    const newPatient: Patient = {
-      id: `pat-${uuidv4()}`,
-      name: patientName,
-      age: parseInt(patientAge, 10),
-      gender: patientGender as 'Male' | 'Female' | 'Other',
-      email: patientEmail,
-      role: 'PATIENT',
-      phone: patientPhone || 'N/A',
-      medicalHistory: 'None',
-      avatar: { id: `avatar-${Math.floor(Math.random() * 5) + 1}`, imageUrl: `https://picsum.photos/seed/avatar${Math.floor(Math.random() * 5) + 1}/100/100`, description: 'avatar', imageHint: 'person' },
-    };
-    
-    // In a real app, you'd save this to Firestore.
-    // For now, we update the mock data.
-    patients.push(newPatient);
-    users.push(newPatient);
+    try {
+      // In a real app, you would also collect a password or use a different sign-up method.
+      // For this demo, we'll use a standard password.
+      const userCredential = await createUserWithEmailAndPassword(auth, patientEmail, 'password');
+      const user = userCredential.user;
 
-    onPatientRegistered(newPatient);
+      const newUser: User = {
+        id: user.uid,
+        name: patientName,
+        email: patientEmail,
+        role: 'PATIENT',
+        phone: patientPhone || 'N/A',
+        avatar: { id: `avatar-${Math.floor(Math.random() * 5) + 1}`, imageUrl: `https://picsum.photos/seed/avatar${Math.floor(Math.random() * 5) + 1}/100/100`, description: 'avatar', imageHint: 'person' },
+      };
+      
+      const newPatient: Omit<Patient, 'name' | 'email' | 'role' | 'phone' | 'avatar'> = {
+        id: `pat-${user.uid}`,
+        userId: user.uid,
+        age: parseInt(patientAge, 10),
+        gender: patientGender as 'Male' | 'Female' | 'Other',
+        medicalHistory: 'None',
+      };
 
-    toast({
-      title: 'Patient Registered',
-      description: `${patientName} has been successfully added to the system.`,
-    });
+      // Save the user profile and patient data to Firestore
+      await setDoc(doc(firestore, "users", user.uid), newUser);
+      await setDoc(doc(firestore, `users/${user.uid}/patients`, newPatient.id), newPatient);
+      
+      // Also update mock data for immediate UI update
+      users.push(newUser);
+      
+      onPatientRegistered(newUser);
 
-    // Reset form
-    setPatientName('');
-    setPatientAge('');
-    setPatientGender('');
-    setPatientEmail('');
-    setPatientPhone('');
+      toast({
+        title: 'Patient Registered',
+        description: `${patientName} has been successfully added to the system.`,
+      });
+
+      // Reset form
+      setPatientName('');
+      setPatientAge('');
+      setPatientGender('');
+      setPatientEmail('');
+      setPatientPhone('');
+
+    } catch (error: any) {
+       console.error("Error registering patient: ", error);
+        toast({
+            variant: "destructive",
+            title: "Registration Failed",
+            description: error.message,
+        });
+    }
   };
 
   return (
